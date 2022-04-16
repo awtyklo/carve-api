@@ -1,0 +1,20 @@
+{
+    "name": "awtyklo/carve-api",
+    "type": "library",
+    "description": "Consistent and reusable way of composing REST API endpoints for Symfony",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Arek Wtykło"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/framework-bundle": "5.4.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Carve\\ApiBundle\\": "src/"
+        }
+    }
+}
