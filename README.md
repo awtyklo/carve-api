@@ -1,2 +1,3 @@
-# carve-api
-onsistent and reusable way of composing REST API endpoints
+# Carve API
+
+Consistent and reusable way of composing REST API endpoints for Symfony
