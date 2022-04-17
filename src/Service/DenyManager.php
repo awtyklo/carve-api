@@ -28,7 +28,7 @@ class DenyManager
     protected function getDenyObject(string $denyClass): AbstractApiObjectDeny
     {
         if (!$this->locator->has($denyClass)) {
-            throw new \Exception('Class "'.$denyClass.'" is not available in service locator that include services tagged with "api.deny"');
+            throw new \Exception('Class "'.$denyClass.'" is not available in service locator that include services tagged with "carve_api.object_deny"');
         }
 
         return $this->locator->get($denyClass);

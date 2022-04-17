@@ -2,6 +2,14 @@
     "name": "awtyklo/carve-api",
     "type": "library",
     "description": "Consistent and reusable way of composing REST API endpoints for Symfony",
+    "keywords": [
+        "rest",
+        "api",
+        "rest api",
+        "symfony",
+        "documentation",
+        "doc"
+    ],
     "license": "MIT",
     "authors": [
         {
