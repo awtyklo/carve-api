@@ -6,6 +6,11 @@ services:
     carve_api.serializer.circular_reference_handler:
         class: Carve\ApiBundle\Serializer\CircularReferenceHandler
 
+    carve_api.event_subscriber.debug_toolbar_replace_subscriber:
+        class: Carve\ApiBundle\EventSubscriber\DebugToolbarReplaceSubscriber
+        tags:
+            - { name: kernel.event_listener, event: kernel.response }
+
     Carve\ApiBundle\Service\DenyManager:
         class: Carve\ApiBundle\Service\DenyManager
         arguments:
