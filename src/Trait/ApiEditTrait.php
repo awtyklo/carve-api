@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Carve\ApiBundle\Trait;
 
 use Carve\ApiBundle\Attribute as Api;
+use Carve\ApiBundle\Deny\AbstractApiObjectDeny;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,9 +19,11 @@ trait ApiEditTrait
     #[Api\EditResponse200]
     #[Api\Response400]
     #[Api\Response404]
-    public function editAction(Request $request)
+    public function editAction(Request $request, int $id)
     {
-        return $this->handleForm($this->getEditFormClass(), $request, [$this, 'processEdit'], $this->getEditObject(), $this->getEditFormOptions());
+        $object = $this->find($id, AbstractApiObjectDeny::EDIT);
+
+        return $this->handleForm($this->getEditFormClass(), $request, [$this, 'processEdit'], $object, $this->getEditFormOptions());
     }
 
     protected function getEditFormOptions(): array
