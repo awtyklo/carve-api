@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace Carve\ApiBundle\Trait;
 
 use Carve\ApiBundle\Attribute as Api;
-use Carve\ApiBundle\Entity\Project;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation as NA;
-use OpenApi\Attributes as OA;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
