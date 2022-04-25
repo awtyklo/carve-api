@@ -6,6 +6,12 @@ services:
     carve_api.serializer.circular_reference_handler:
         class: Carve\ApiBundle\Serializer\CircularReferenceHandler
 
+    carve_api.form.type_guesser.doctrine_enum_type_guesser:
+        class: Carve\ApiBundle\Form\TypeGuesser\DoctrineEnumTypeGuesser
+        arguments:
+            - "@doctrine"
+        tags: ["form.type_guesser"]
+
     carve_api.event_subscriber.debug_toolbar_replace_subscriber:
         class: Carve\ApiBundle\EventSubscriber\DebugToolbarReplaceSubscriber
         tags:

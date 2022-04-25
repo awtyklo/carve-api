@@ -23,7 +23,7 @@ Add in `config/services.yaml`.
 ```yaml
 services:
     fos_rest.serializer.form_error_normalizer:
-        class: Carve\ApiBundle\Normalizer\FormErrorNormalizer
+        class: Carve\ApiBundle\Serializer\Normalizer\FormErrorNormalizer
 ```
 
 Add in `config/packages/framework.yaml`.

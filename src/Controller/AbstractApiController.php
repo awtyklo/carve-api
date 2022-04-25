@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace Carve\ApiBundle\Controller;
 
+use OpenApi\Generator;
+use Doctrine\ORM\QueryBuilder;
 use Carve\ApiBundle\Attribute as Api;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Carve\ApiBundle\Enum\ListQueryFilterType;
-use Carve\ApiBundle\Model\ListQueryFilterInterface;
 use Carve\ApiBundle\Model\ListQueryInterface;
+use Symfony\Component\HttpFoundation\Request;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use Carve\ApiBundle\Model\ListQueryFilterInterface;
 use Carve\ApiBundle\Model\ListQuerySortingInterface;
 use Carve\ApiBundle\Service\Helper\DenyManagerTrait;
 use Carve\ApiBundle\Service\Helper\EntityManagerTrait;
-use Doctrine\ORM\QueryBuilder;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use OpenApi\Generator;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 // Could not find option to ignore all properties by default in symfony/serializer
 // By default set an invalid group to avoid exposing contents of whole entity
@@ -179,7 +180,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
                 $queryBuilder->setParameter($filterParameter, $filterValue);
                 break;
             case ListQueryFilterType::EQUAL:
-                if ($this->isManyToManyRelationship($class, $filterBy)) {
+                if ($this->isManyToManyRelationship($filterBy)) {
                     $queryBuilder->andWhere(':'.$filterParameter.' MEMBER OF '.$filterAlias.'.'.$filterBy);
                     $queryBuilder->setParameter($filterParameter, $filterValue);
                 } else {
@@ -188,7 +189,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
                 }
                 break;
             case ListQueryFilterType::EQUALMULTIPLE:
-                if ($this->isManyToManyRelationship($class, $filterBy)) {
+                if ($this->isManyToManyRelationship($filterBy)) {
                     throw new \Exception('Not supported');
                 } else {
                     $queryBuilder->andWhere($filterAlias.'.'.$filterBy.' IN (:'.$filterParameter.')');
@@ -331,5 +332,19 @@ abstract class AbstractApiController extends AbstractFOSRestController
         }
 
         throw new \Exception('Defining "Carve\ApiBundle\Attribute\Resource" attribute is required when extending AbstractApiController');
+    }
+
+    protected function isManyToManyRelationship(string $field)
+    {
+        $classMetadataFactory = $this->entityManager->getMetadataFactory();
+        $metadataClass = $classMetadataFactory->getMetadataFor($this->getClass());
+
+        if (isset($metadataClass->associationMappings[$field])) {
+            if (ClassMetadataInfo::MANY_TO_MANY == $metadataClass->associationMappings[$field]['type']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
