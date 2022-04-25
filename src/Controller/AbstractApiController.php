@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Carve\ApiBundle\Controller;
 
-use OpenApi\Generator;
-use Doctrine\ORM\QueryBuilder;
 use Carve\ApiBundle\Attribute as Api;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Carve\ApiBundle\Enum\ListQueryFilterType;
-use Carve\ApiBundle\Model\ListQueryInterface;
-use Symfony\Component\HttpFoundation\Request;
-use FOS\RestBundle\Controller\Annotations as Rest;
 use Carve\ApiBundle\Model\ListQueryFilterInterface;
+use Carve\ApiBundle\Model\ListQueryInterface;
 use Carve\ApiBundle\Model\ListQuerySortingInterface;
 use Carve\ApiBundle\Service\Helper\DenyManagerTrait;
 use Carve\ApiBundle\Service\Helper\EntityManagerTrait;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\QueryBuilder;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use OpenApi\Generator;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 // Could not find option to ignore all properties by default in symfony/serializer
 // By default set an invalid group to avoid exposing contents of whole entity
