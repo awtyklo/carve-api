@@ -37,6 +37,7 @@ trait ApiListTrait
 
         $rowCountQueryBuilder = clone $queryBuilder;
         $rowCountQueryBuilder->select('COUNT(DISTINCT o.id)');
+        $rowCountQueryBuilder->resetDQLPart('orderBy');
         $rowCountQueryBuilder->setFirstResult(0);
         $rowCountQueryBuilder->setMaxResults(1);
         $rowCount = $rowCountQueryBuilder->getQuery()->getSingleScalarResult();
