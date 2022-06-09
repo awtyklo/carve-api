@@ -19,7 +19,7 @@ class DebugToolbarReplaceSubscriber implements EventSubscriberInterface
         $response->headers->set('Symfony-Debug-Toolbar-Replace', 1);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::RESPONSE => [

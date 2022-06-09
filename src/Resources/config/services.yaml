@@ -12,6 +12,12 @@ services:
             - "@doctrine"
         tags: ["form.type_guesser"]
 
+    carve_api.form.type_guesser.doctrine_orm_type_guesser:
+        class: Carve\ApiBundle\Form\TypeGuesser\DoctrineOrmTypeGuesser
+        arguments:
+            - "@doctrine"
+        tags: ["form.type_guesser"]
+
     carve_api.event_subscriber.debug_toolbar_replace_subscriber:
         class: Carve\ApiBundle\EventSubscriber\DebugToolbarReplaceSubscriber
         tags:
