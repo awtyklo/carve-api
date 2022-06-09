@@ -11,7 +11,6 @@ class Length extends Assert\Length
 {
     public $minMessage = 'validation.tooShort';
     public $maxMessage = 'validation.tooLong';
-    public $max = 255;
 
     public function validatedBy()
     {
