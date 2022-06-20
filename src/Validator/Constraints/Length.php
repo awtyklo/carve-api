@@ -12,7 +12,7 @@ class Length extends Assert\Length
     public $minMessage = 'validation.tooShort';
     public $maxMessage = 'validation.tooLong';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return Assert\LengthValidator::class;
     }

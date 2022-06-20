@@ -12,7 +12,7 @@ class IntegerType extends Assert\Type
     public $message = 'validation.invalidType';
     public $type = 'integer';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return Assert\TypeValidator::class;
     }

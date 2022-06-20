@@ -11,7 +11,7 @@ class GreaterThanOrEqual extends Assert\GreaterThanOrEqual
 {
     public $message = 'validation.greaterThanOrEqual';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return Assert\GreaterThanOrEqualValidator::class;
     }

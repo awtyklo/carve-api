@@ -11,7 +11,7 @@ class Url extends Assert\Url
 {
     public $message = 'validation.invalidUrl';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return Assert\Urlalidator::class;
     }

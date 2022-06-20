@@ -11,7 +11,7 @@ class LessThanOrEqual extends Assert\LessThanOrEqual
 {
     public $message = 'validation.lessThanOrEqual';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return Assert\LessThanOrEqualValidator::class;
     }

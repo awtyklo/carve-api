@@ -11,7 +11,7 @@ class NotBlank extends Assert\NotBlank
 {
     public $message = 'validation.required';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return Assert\NotBlankValidator::class;
     }
