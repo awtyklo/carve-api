@@ -1,0 +1,12 @@
+{
+    "validation": {
+        "tooLong": "Too long value",
+        "tooShort": "Too short value",
+        "identifierMustNotBeEmpty": "Router indentifier is required",
+        "required": "This field is required",
+        "invalidType": "This value should be of type {{ type }}.",
+        "greaterThanOrEqual": "This value should be greater than or equal {{ compared_value }}",
+        "lessThanOrEqual": "This value should be less than or equal {{ compared_value }}",
+        "emailInvalid": "Invalid e-mail address"
+    }
+}
