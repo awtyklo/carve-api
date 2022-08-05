@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class IntegerType extends Assert\Type
 {
-    public $message = 'validation.invalidIntegerType';
+    public $message = 'validation.integerType';
     public $type = 'integer';
 
     public function validatedBy(): string

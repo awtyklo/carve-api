@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class IdenticalCompare extends Constraint
 {
-    public $message = 'validation.notIdentical';
+    public $message = 'validation.identicalCompare';
     public $propertyPath1;
     public $propertyPath2;
 

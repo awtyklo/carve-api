@@ -12,6 +12,18 @@ services:
             - "@doctrine"
         tags: ["form.type_guesser"]
 
+    carve_api.form.type_guesser.doctrine_integer_type_guesser:
+        class: Carve\ApiBundle\Form\TypeGuesser\DoctrineIntegerTypeGuesser
+        arguments:
+            - "@doctrine"
+        tags: ["form.type_guesser"]
+
+    carve_api.form.type_guesser.doctrine_string_type_guesser:
+        class: Carve\ApiBundle\Form\TypeGuesser\DoctrineStringTypeGuesser
+        arguments:
+            - "@doctrine"
+        tags: ["form.type_guesser"]
+
     carve_api.event_subscriber.debug_toolbar_replace_subscriber:
         class: Carve\ApiBundle\EventSubscriber\DebugToolbarReplaceSubscriber
         tags:

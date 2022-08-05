@@ -7,12 +7,12 @@ namespace Carve\ApiBundle\Validator\Constraints;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-class Url extends Assert\Url
+class GreaterThan extends Assert\GreaterThan
 {
-    public $message = 'validation.url';
+    public $message = 'validation.greaterThan';
 
-    public function validatedBy(): string
+    public function validatedBy()
     {
-        return Assert\UrlValidator::class;
+        return Assert\GreaterThanValidator::class;
     }
 }

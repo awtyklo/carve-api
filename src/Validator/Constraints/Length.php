@@ -9,8 +9,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Length extends Assert\Length
 {
-    public $minMessage = 'validation.tooShort';
-    public $maxMessage = 'validation.tooLong';
+    public $minMessage = 'validation.lengthMin';
+    public $maxMessage = 'validation.lengthMax';
 
     public function validatedBy(): string
     {

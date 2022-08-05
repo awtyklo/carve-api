@@ -2,19 +2,19 @@
 
 namespace Carve\ApiBundle\Form\TypeGuesser;
 
-use Doctrine\ORM\Mapping\Column;
+use Carve\ApiBundle\Validator\Constraints\OrmStringType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
-use Doctrine\ORM\Mapping\ReflectionEnumProperty;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\Proxy;
-use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 
-class DoctrineEnumTypeGuesser implements FormTypeGuesserInterface
+class DoctrineStringTypeGuesser implements FormTypeGuesserInterface
 {
     protected $registry;
 
@@ -27,29 +27,25 @@ class DoctrineEnumTypeGuesser implements FormTypeGuesserInterface
 
     public function guessType($class, $property): ?TypeGuess
     {
-        $ret = $this->getMetadata($class);
-        if (!$ret) {
+        if (!$ret = $this->getMetadata($class)) {
             return null;
         }
 
-        [$metadata] = $ret;
+        [$metadata, $name] = $ret;
 
-        $reflectionProperty = $metadata->getReflectionProperty($property);
-        if ($reflectionProperty instanceof ReflectionEnumProperty) {
-            $enumType = null;
+        if ($metadata->hasAssociation($property)) {
+            return null;
+        }
 
-            $attributes = $reflectionProperty->getAttributes(Column::class);
-            foreach ($attributes as $attribute) {
-                $attributeInstance = $attribute->newInstance();
-                $enumType = $attributeInstance->enumType;
-                break;
-            }
-
-            if (null === $enumType) {
-                return null;
-            }
-
-            return new TypeGuess(EnumType::class, ['class' => $enumType, 'invalid_message' => 'validation.enum'], Guess::VERY_HIGH_CONFIDENCE);
+        switch ($metadata->getTypeOfField($property)) {
+            case Types::STRING:
+                return new TypeGuess(
+                    TextType::class,
+                    [
+                        'constraints' => new OrmStringType(),
+                    ],
+                    Guess::VERY_HIGH_CONFIDENCE
+                );
         }
 
         return null;
