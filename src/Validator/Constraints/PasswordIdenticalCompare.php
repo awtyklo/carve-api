@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class PasswordIdenticalCompare extends Constraint
 {
-    public $message = 'validation.passwordNotIdentical';
+    public $message = 'validation.passwordIdenticalCompare';
     public $propertyPath1;
     public $propertyPath2;
 

@@ -33,3 +33,30 @@ framework:
     serializer:
         circular_reference_handler: carve_api.serializer.circular_reference_handler
 ```
+
+## Local development
+
+Add to `composer.json` in your project following lines:
+
+```
+    "repositories": [
+        {
+            "type": "path",
+            "url": "/var/www/carve-api"
+        }
+    ],
+```
+
+Change `"/var/www/carve-api"` to your local path to the package. It should point to the root directory of `carve-api` (this means `composer.json` of `carve-api` is located in `/var/www/carve-api/composer.json`).
+
+Afterwads execute:
+
+```
+composer require "awtyklo/carve-api @dev"
+```
+
+It should link local package instead of one from remote.
+
+**Note!** It will change `composer.json`. Please remember that while committing changes.
+
+TODO: How to revert this

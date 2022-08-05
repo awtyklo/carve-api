@@ -1,0 +1,21 @@
+{
+    "validation": {
+        "required": "This value is required",
+        "integerType": "This value is not a valid integer",
+        "identicalCompare": "Values should be identical",
+        "passwordIdenticalCompare": "Passwords should be identical",
+        "lengthMin": "This value is too short. It should have {{ limit }} characters or more",
+        "lengthMax": "This value is too long. It should have {{ limit }} characters or less",
+        "lessThan": "This value should be less than {{ compared_value }}",
+        "lessThanOrEqual": "This value should be less than or equal {{ compared_value }}",
+        "greaterThan": "This value should be greater than {{ compared_value }}",
+        "greaterThanOrEqual": "This value should be greater than or equal {{ compared_value }}",
+        "integer": "This value is not a valid integer",
+        "url": "This value is not a valid url",
+        "rangeDateTime": "This is not a valid datetime value",
+        "rangeNumber": "This is not a valid number",
+        "rangeMin": "This value should be {{ limit }} or less",
+        "rangeMax": "This value should be {{ limit }} or more",
+        "notInRange": "This value should be between {{ min }} and {{ max }}"
+    }
+}
