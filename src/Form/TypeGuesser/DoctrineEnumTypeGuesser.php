@@ -49,7 +49,7 @@ class DoctrineEnumTypeGuesser implements FormTypeGuesserInterface
                 return null;
             }
 
-            return new TypeGuess(EnumType::class, ['class' => $enumType, 'invalid_message' => 'validation.enumInvalid'], Guess::VERY_HIGH_CONFIDENCE);
+            return new TypeGuess(EnumType::class, ['class' => $enumType, 'invalid_message' => 'validation.enum'], Guess::VERY_HIGH_CONFIDENCE);
         }
 
         return null;

@@ -1,6 +1,7 @@
 {
     "validation": {
         "required": "This value is required",
+        "enum": "This is not a valid value",
         "integerType": "This value is not a valid integer",
         "identicalCompare": "Values should be identical",
         "passwordIdenticalCompare": "Passwords should be identical",
