@@ -24,10 +24,10 @@ class DateModifierValidator extends ConstraintValidator
             $result = $dateTime->modify($value);
 
             if (false === $result) {
-                $this->context->buildViolation($constraint->messageDateModifier)->addViolation();
+                $this->context->buildViolation($constraint->message)->addViolation();
             }
         } catch (\Exception $e) {
-            $this->context->buildViolation($constraint->messageDateModifier)->addViolation();
+            $this->context->buildViolation($constraint->message)->addViolation();
         }
     }
 }
