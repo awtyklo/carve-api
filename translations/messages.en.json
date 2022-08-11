@@ -20,6 +20,7 @@
         "rangeNotIn": "This value should be between {{ min }} and {{ max }}",
         "choice": "This is not a valid choice",
         "dateModifier": "Invalid date modifier format",
-        "cssColor": "This value is not a valid CSS color"
+        "cssColor": "This value is not a valid CSS color",
+        "uniqueEntity": "This value is already used"
     }
 }
