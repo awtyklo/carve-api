@@ -22,7 +22,7 @@ class NotBlankOnTrue extends NotBlank
         parent::__construct($options, $message, $allowNull, $normalizer, $groups, $payload);
     }
 
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return [
             'propertyPath',

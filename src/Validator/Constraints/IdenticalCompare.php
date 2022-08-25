@@ -26,7 +26,7 @@ class IdenticalCompare extends Constraint
         parent::__construct($options, $groups, $payload);
     }
 
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return [
             'propertyPath1',
