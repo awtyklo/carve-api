@@ -11,7 +11,7 @@ class GreaterThan extends Assert\GreaterThan
 {
     public $message = 'validation.greaterThan';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return Assert\GreaterThanValidator::class;
     }

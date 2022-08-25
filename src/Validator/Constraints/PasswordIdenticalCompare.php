@@ -9,7 +9,7 @@ class PasswordIdenticalCompare extends IdenticalCompare
 {
     public $message = 'validation.passwordIdenticalCompare';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return IdenticalCompareValidator::class;
     }

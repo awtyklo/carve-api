@@ -12,7 +12,7 @@ class UniqueEntity extends BaseUniqueEntity
 {
     public $message = 'validation.uniqueEntity';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return UniqueEntityValidator::class;
     }
