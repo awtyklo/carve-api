@@ -11,7 +11,7 @@ class LessThan extends Assert\LessThan
 {
     public $message = 'validation.lessThan';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return Assert\LessThanValidator::class;
     }
