@@ -11,6 +11,7 @@ use Carve\ApiBundle\Model\ListQueryInterface;
 use Carve\ApiBundle\Model\ListQuerySortingInterface;
 use Carve\ApiBundle\Service\Helper\DenyManagerTrait;
 use Carve\ApiBundle\Service\Helper\EntityManagerTrait;
+use Carve\ApiBundle\Service\Helper\SerializerExtractorTrait;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -27,6 +28,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
 {
     use EntityManagerTrait;
     use DenyManagerTrait;
+    use SerializerExtractorTrait;
 
     protected function modifyQueryBuilder(QueryBuilder $queryBuilder, string $alias): void
     {
@@ -317,7 +319,11 @@ abstract class AbstractApiController extends AbstractFOSRestController
         $attribute = $this->getApiResourceAttribute();
         $attributeInstance = $attribute->newInstance();
 
-        return $attributeInstance->$argument ?? null;
+        if ($attributeInstance->$argument === Generator::UNDEFINED) {
+            return null;
+        }
+
+        return $attributeInstance->$argument;
     }
 
     protected function getApiResourceAttribute()
@@ -346,5 +352,71 @@ abstract class AbstractApiController extends AbstractFOSRestController
         }
 
         return false;
+    }
+
+    protected function getSerializerGroups(): ?array
+    {
+        $reflectionClass = new \ReflectionClass($this);
+        foreach ($reflectionClass->getAttributes(Rest\View::class) as $attribute) {
+            $attributeInstance = $attribute->newInstance();
+            $serializerGroups = $attributeInstance->getSerializerGroups();
+
+            return count($serializerGroups) > 0 ? $serializerGroups : null;
+        }
+
+        // Additionally check parent class
+        $reflectionParentClass = $reflectionClass->getParentClass();
+        foreach ($reflectionParentClass->getAttributes(Rest\View::class) as $attribute) {
+            $attributeInstance = $attribute->newInstance();
+            $serializerGroups = $attributeInstance->getSerializerGroups();
+
+            return count($serializerGroups) > 0 ? $serializerGroups : null;
+        }
+
+        return null;
+    }
+
+    protected function getDefaultListFormOptions(): array
+    {
+        $class = $this->getClass();
+
+        $sortingSerializerGroups = $this->getApiResourceAttributeArgument('listFormSortingFieldGroups');
+        if (null === $sortingSerializerGroups) {
+            $sortingDefaultSerializerGroups = $this->getSerializerGroups();
+
+            if (null !== $sortingDefaultSerializerGroups) {
+                $sortingSerializerGroups = AbstractApiController::normalizeSortingDefaultSerializerGroups($sortingDefaultSerializerGroups);
+            }
+        }
+
+        $sortingFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $sortingSerializerGroups]);
+        $sortingFieldAppend = $this->getApiResourceAttributeArgument('listFormSortingFieldAppend');
+        if (null !== $sortingFieldAppend) {
+            $sortingFieldChoices = AbstractApiController::appendSortingField($sortingFieldChoices, $sortingFieldAppend);
+        }
+
+        return ['sorting_field_choices' => $sortingFieldChoices];
+    }
+
+    public static function normalizeSortingDefaultSerializerGroups(array $serializerGroups)
+    {
+        // Replace serializer group 'identification' with 'id', when using default serializer groups
+        $identificationKey = array_search('identification', $serializerGroups);
+        if (false !== $identificationKey) {
+            array_splice($serializerGroups, $identificationKey, 1, ['id']);
+        }
+
+        // Remove serializer group 'representation', when using default serializer groups
+        $representationKey = array_search('representation', $serializerGroups);
+        if (false !== $representationKey) {
+            array_splice($serializerGroups, $representationKey, 1);
+        }
+
+        return $serializerGroups;
+    }
+
+    public static function appendSortingField(array $sortingFieldChoices, array $sortingFieldAppend)
+    {
+        return array_unique(array_merge($sortingFieldChoices, $sortingFieldAppend));
     }
 }

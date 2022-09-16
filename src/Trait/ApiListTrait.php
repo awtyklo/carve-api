@@ -28,7 +28,7 @@ trait ApiListTrait
 
     protected function getListFormOptions(): array
     {
-        return [];
+        return $this->getDefaultListFormOptions();
     }
 
     protected function processList($object, FormInterface $form)
