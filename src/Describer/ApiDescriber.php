@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Carve\ApiBundle\Describer;
 
 use Carve\ApiBundle\Attribute as Api;
+use Carve\ApiBundle\Controller\AbstractApiController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation as NA;
 use Nelmio\ApiDocBundle\OpenApiPhp\Util;
@@ -12,13 +13,22 @@ use Nelmio\ApiDocBundle\RouteDescriber\RouteDescriberInterface;
 use Nelmio\ApiDocBundle\RouteDescriber\RouteDescriberTrait;
 use OpenApi\Annotations as OA;
 use OpenApi\Generator;
+use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\String\Inflector\EnglishInflector;
+
 use function Symfony\Component\String\u;
 
 class ApiDescriber implements RouteDescriberInterface
 {
     use RouteDescriberTrait;
+
+    protected $serializerExtractor;
+
+    public function __construct(SerializerExtractor $serializerExtractor)
+    {
+        $this->serializerExtractor = $serializerExtractor;
+    }
 
     public function describe(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
@@ -54,6 +64,10 @@ class ApiDescriber implements RouteDescriberInterface
 
         foreach ($this->getOperations($api, $route) as $operation) {
             $response = $this->findResponse($operation, Api\Response404::class);
+            if (!$response) {
+                continue;
+            }
+
             $response->description = $this->getSubjectTitle($reflectionMethod).' with specified ID was not found';
         }
     }
@@ -93,6 +107,10 @@ class ApiDescriber implements RouteDescriberInterface
 
         foreach ($this->getOperations($api, $route) as $operation) {
             $response = $this->findResponse($operation, Api\CreateResponse200::class);
+            if (!$response) {
+                continue;
+            }
+
             $response->description = 'Returns created '.$this->getSubjectLower($reflectionMethod);
 
             // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
@@ -140,6 +158,10 @@ class ApiDescriber implements RouteDescriberInterface
 
         foreach ($this->getOperations($api, $route) as $operation) {
             $response = $this->findResponse($operation, Api\DeleteResponse204::class);
+            if (!$response) {
+                continue;
+            }
+
             $response->description = $this->getSubjectTitle($reflectionMethod).' successfully deleted';
         }
     }
@@ -191,6 +213,10 @@ class ApiDescriber implements RouteDescriberInterface
 
         foreach ($this->getOperations($api, $route) as $operation) {
             $response = $this->findResponse($operation, Api\EditResponse200::class);
+            if (!$response) {
+                continue;
+            }
+
             $response->description = 'Returns edited '.$this->getSubjectLower($reflectionMethod);
 
             // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
@@ -238,6 +264,10 @@ class ApiDescriber implements RouteDescriberInterface
 
         foreach ($this->getOperations($api, $route) as $operation) {
             $response = $this->findResponse($operation, Api\GetResponse200::class);
+            if (!$response) {
+                continue;
+            }
+
             $response->description = 'Returns '.$this->getSubjectLower($reflectionMethod);
 
             // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
@@ -275,7 +305,25 @@ class ApiDescriber implements RouteDescriberInterface
             // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
             foreach ($operation->requestBody->_unmerged as $unmerged) {
                 if ($unmerged instanceof OA\JsonContent) {
-                    $unmerged->ref = new NA\Model(type: $this->getListFormClass($reflectionMethod));
+                    $class = $this->getClass($reflectionMethod);
+
+                    $serializerGroups = $this->getListFormSortingFieldGroups($reflectionMethod);
+                    if (Generator::UNDEFINED === $serializerGroups) {
+                        $defaultSerializerGroups = $this->getSerializerGroups($reflectionMethod);
+
+                        if (null !== $defaultSerializerGroups) {
+                            $serializerGroups = AbstractApiController::normalizeSortingDefaultSerializerGroups($defaultSerializerGroups);
+                        }
+                    }
+
+                    $sortingFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $serializerGroups]);
+
+                    $sortingFieldAppend = $this->getListFormSortingFieldAppend($reflectionMethod);
+                    if (Generator::UNDEFINED !== $sortingFieldAppend) {
+                        $sortingFieldChoices = AbstractApiController::appendSortingField($sortingFieldChoices, $sortingFieldAppend);
+                    }
+
+                    $unmerged->ref = new NA\Model(type: $this->getListFormClass($reflectionMethod), options: ['sorting_field_choices' => $sortingFieldChoices]);
                 }
             }
         }
@@ -289,6 +337,10 @@ class ApiDescriber implements RouteDescriberInterface
 
         foreach ($this->getOperations($api, $route) as $operation) {
             $response = $this->findResponse($operation, Api\ListResponse200::class);
+            if (!$response) {
+                continue;
+            }
+
             $response->description = 'Returns list of '.$this->getSubjectPlural($reflectionMethod);
 
             foreach ($response->content as $content) {
@@ -380,7 +432,17 @@ class ApiDescriber implements RouteDescriberInterface
         return $this->getApiResourceProperty($reflectionMethod, 'listFormClass');
     }
 
-    protected function getApiResourceProperty(\ReflectionMethod $reflectionMethod, string $propertyName): string
+    protected function getListFormSortingFieldGroups(\ReflectionMethod $reflectionMethod): string|array
+    {
+        return $this->getApiResourceProperty($reflectionMethod, 'listFormSortingFieldGroups');
+    }
+
+    protected function getListFormSortingFieldAppend(\ReflectionMethod $reflectionMethod): string|array
+    {
+        return $this->getApiResourceProperty($reflectionMethod, 'listFormSortingFieldAppend');
+    }
+
+    protected function getApiResourceProperty(\ReflectionMethod $reflectionMethod, string $propertyName): string|array
     {
         $reflectionClass = new \ReflectionClass($reflectionMethod->class);
         foreach ($reflectionClass->getAttributes(Api\Resource::class) as $attribute) {

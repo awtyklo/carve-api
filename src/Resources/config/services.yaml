@@ -1,6 +1,8 @@
 services:
     carve_api.describer.api_describer:
         class: Carve\ApiBundle\Describer\ApiDescriber
+        arguments:
+            - "@property_info.serializer_extractor"
         tags: ["nelmio_api_doc.route_describer"]
 
     carve_api.serializer.circular_reference_handler:

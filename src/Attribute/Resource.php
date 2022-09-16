@@ -8,6 +8,7 @@ use Carve\ApiBundle\Form\ListQueryType;
 use OpenApi\Annotations as OAA;
 use OpenApi\Attributes as OA;
 use OpenApi\Generator;
+
 use function Symfony\Component\String\u;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
@@ -18,6 +19,8 @@ class Resource extends OAA\Tag
     public $createFormClass = Generator::UNDEFINED;
     public $editFormClass = Generator::UNDEFINED;
     public $listFormClass = Generator::UNDEFINED;
+    public $listFormSortingFieldGroups = Generator::UNDEFINED;
+    public $listFormSortingFieldAppend = Generator::UNDEFINED;
     public $subject = Generator::UNDEFINED;
 
     /**
@@ -34,6 +37,8 @@ class Resource extends OAA\Tag
         'createFormClass' => 'string',
         'editFormClass' => 'string',
         'listFormClass' => 'string',
+        'listFormSortingFieldGroups' => 'array',
+        'listFormSortingFieldAppend' => 'array',
         'subject' => 'string',
     ];
 
@@ -43,6 +48,8 @@ class Resource extends OAA\Tag
         ?string $createFormClass = null,
         ?string $editFormClass = null,
         ?string $listFormClass = ListQueryType::class,
+        ?array $listFormSortingFieldGroups = null,
+        ?array $listFormSortingFieldAppend = null,
         ?string $subject = null,
         bool|string $tag = true,
         ?OA\ExternalDocumentation $externalDocs = null,
@@ -57,6 +64,8 @@ class Resource extends OAA\Tag
             'createFormClass' => $createFormClass ?? Generator::UNDEFINED,
             'editFormClass' => $editFormClass ?? Generator::UNDEFINED,
             'listFormClass' => $listFormClass ?? Generator::UNDEFINED,
+            'listFormSortingFieldGroups' => $listFormSortingFieldGroups ?? Generator::UNDEFINED,
+            'listFormSortingFieldAppend' => $listFormSortingFieldAppend ?? Generator::UNDEFINED,
             'x' => $x ?? Generator::UNDEFINED,
             'value' => $this->combine($externalDocs, $attachables),
         ];

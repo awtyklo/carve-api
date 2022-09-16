@@ -31,6 +31,9 @@ class ListQueryType extends AbstractType
         ]);
         $builder->add('sorting', CollectionType::class, [
             'entry_type' => ListQuerySortingType::class,
+            'entry_options' => [
+                'field_choices' => $options['sorting_field_choices'],
+            ],
             'allow_add' => true,
         ]);
         $builder->add('filters', CollectionType::class, [
@@ -43,6 +46,7 @@ class ListQueryType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => ListQuery::class,
+            'sorting_field_choices' => [],
         ]);
     }
 }
