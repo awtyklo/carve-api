@@ -306,9 +306,16 @@ class ApiDescriber implements RouteDescriberInterface
                         $filterByChoices = AbstractApiController::appendFieldChoice($filterByChoices, $filterByAppend);
                     }
 
-                    $unmerged->ref = new NA\Model(type: $this->getListFormClass($reflectionMethod), options: [
+                    // This value is used only to force generating different schemas for different endpoints for
+                    // ListQueryType / ListQuerySortingType / ListQueryFilterType
+                    $uniqueDocumentationGroup = md5(serialize($sortingFieldChoices).serialize($filterByChoices));
+
+                    $unmerged->ref = new NA\Model(groups: [$uniqueDocumentationGroup], type: $this->getListFormClass($reflectionMethod), options: [
                         'sorting_field_choices' => $sortingFieldChoices,
                         'filter_filterBy_choices' => $filterByChoices,
+                        'documentation' => [
+                            'groups' => [$uniqueDocumentationGroup],
+                        ],
                     ]);
                 }
             }

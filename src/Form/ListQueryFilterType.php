@@ -36,7 +36,7 @@ class ListQueryFilterType extends AbstractType
             'invalid_message' => 'validation.enum',
             'documentation' => [
                 'description' => 'Filter type',
-                'example' => 'like',
+                'example' => 'equal',
             ],
         ]);
         $builder->get('filterType')->addEventListener(FormEvents::POST_SUBMIT, [$this, 'onPostSubmit']);
