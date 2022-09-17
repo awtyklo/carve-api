@@ -16,6 +16,7 @@ class ListQueryType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('page', IntegerType::class, [
+            'invalid_message' => 'validation.integer',
             'documentation' => [
                 'type' => 'integer',
                 'example' => 1,
@@ -23,6 +24,7 @@ class ListQueryType extends AbstractType
             ],
         ]);
         $builder->add('rowsPerPage', IntegerType::class, [
+            'invalid_message' => 'validation.integer',
             'documentation' => [
                 'type' => 'integer',
                 'example' => 10,
@@ -38,6 +40,9 @@ class ListQueryType extends AbstractType
         ]);
         $builder->add('filters', CollectionType::class, [
             'entry_type' => ListQueryFilterType::class,
+            'entry_options' => [
+                'filterBy_choices' => $options['filter_filterBy_choices'],
+            ],
             'allow_add' => true,
         ]);
     }
@@ -47,6 +52,7 @@ class ListQueryType extends AbstractType
         $resolver->setDefaults([
             'data_class' => ListQuery::class,
             'sorting_field_choices' => [],
+            'filter_filterBy_choices' => [],
         ]);
     }
 }

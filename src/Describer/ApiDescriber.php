@@ -276,24 +276,40 @@ class ApiDescriber implements RouteDescriberInterface
             foreach ($operation->requestBody->_unmerged as $unmerged) {
                 if ($unmerged instanceof OA\JsonContent) {
                     $class = $this->getClass($reflectionMethod);
+                    $defaultSerializerGroups = $this->getSerializerGroups($reflectionMethod);
 
-                    $serializerGroups = $this->getListFormSortingFieldGroups($reflectionMethod);
-                    if (Generator::UNDEFINED === $serializerGroups) {
-                        $defaultSerializerGroups = $this->getSerializerGroups($reflectionMethod);
-
+                    $sortingSerializerGroups = $this->getListFormSortingFieldGroups($reflectionMethod);
+                    if (Generator::UNDEFINED === $sortingSerializerGroups) {
                         if (null !== $defaultSerializerGroups) {
-                            $serializerGroups = AbstractApiController::normalizeSortingDefaultSerializerGroups($defaultSerializerGroups);
+                            $sortingSerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
                         }
                     }
 
-                    $sortingFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $serializerGroups]);
+                    $sortingFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $sortingSerializerGroups]);
 
                     $sortingFieldAppend = $this->getListFormSortingFieldAppend($reflectionMethod);
                     if (Generator::UNDEFINED !== $sortingFieldAppend) {
-                        $sortingFieldChoices = AbstractApiController::appendSortingField($sortingFieldChoices, $sortingFieldAppend);
+                        $sortingFieldChoices = AbstractApiController::appendFieldChoice($sortingFieldChoices, $sortingFieldAppend);
                     }
 
-                    $unmerged->ref = new NA\Model(type: $this->getListFormClass($reflectionMethod), options: ['sorting_field_choices' => $sortingFieldChoices]);
+                    $filterBySerializerGroups = $this->getListFormFilterByGroups($reflectionMethod);
+                    if (Generator::UNDEFINED === $filterBySerializerGroups) {
+                        if (null !== $defaultSerializerGroups) {
+                            $filterBySerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
+                        }
+                    }
+
+                    $filterByChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $filterBySerializerGroups]);
+
+                    $filterByAppend = $this->getListFormFilterByAppend($reflectionMethod);
+                    if (Generator::UNDEFINED !== $filterByAppend) {
+                        $filterByChoices = AbstractApiController::appendFieldChoice($filterByChoices, $filterByAppend);
+                    }
+
+                    $unmerged->ref = new NA\Model(type: $this->getListFormClass($reflectionMethod), options: [
+                        'sorting_field_choices' => $sortingFieldChoices,
+                        'filter_filterBy_choices' => $filterByChoices,
+                    ]);
                 }
             }
         }
@@ -410,6 +426,16 @@ class ApiDescriber implements RouteDescriberInterface
     protected function getListFormSortingFieldAppend(\ReflectionMethod $reflectionMethod): string|array
     {
         return $this->getApiResourceProperty($reflectionMethod, 'listFormSortingFieldAppend');
+    }
+
+    protected function getListFormFilterByGroups(\ReflectionMethod $reflectionMethod): string|array
+    {
+        return $this->getApiResourceProperty($reflectionMethod, 'listFormFilterByGroups');
+    }
+
+    protected function getListFormFilterByAppend(\ReflectionMethod $reflectionMethod): string|array
+    {
+        return $this->getApiResourceProperty($reflectionMethod, 'listFormFilterByAppend');
     }
 
     protected function getApiResourceProperty(\ReflectionMethod $reflectionMethod, string $propertyName): string|array

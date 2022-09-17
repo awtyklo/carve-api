@@ -9,6 +9,7 @@ use Carve\ApiBundle\Model\ListQueryFilter;
 use Carve\ApiBundle\Validator\Constraints as Assert;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
@@ -23,15 +24,16 @@ class ListQueryFilterType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('filterBy', null, [
+        $builder->add('filterBy', ChoiceType::class, [
+            'choices' => $options['filterBy_choices'],
+            'invalid_message' => 'validation.choice',
             'documentation' => [
-                'type' => 'string',
-                'example' => 'myFieldName',
                 'description' => 'Field to filter by',
             ],
         ]);
         $builder->add('filterType', EnumType::class, [
             'class' => ListQueryFilterTypeEnum::class,
+            'invalid_message' => 'validation.enum',
             'documentation' => [
                 'description' => 'Filter type',
                 'example' => 'like',
@@ -102,6 +104,7 @@ class ListQueryFilterType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => ListQueryFilter::class,
+            'filterBy_choices' => [],
         ]);
     }
 }

@@ -21,6 +21,8 @@ class Resource extends OAA\Tag
     public $listFormClass = Generator::UNDEFINED;
     public $listFormSortingFieldGroups = Generator::UNDEFINED;
     public $listFormSortingFieldAppend = Generator::UNDEFINED;
+    public $listFormFilterByGroups = Generator::UNDEFINED;
+    public $listFormFilterByAppend = Generator::UNDEFINED;
     public $subject = Generator::UNDEFINED;
 
     /**
@@ -39,6 +41,8 @@ class Resource extends OAA\Tag
         'listFormClass' => 'string',
         'listFormSortingFieldGroups' => 'array',
         'listFormSortingFieldAppend' => 'array',
+        'listFormFilterByGroups' => 'array',
+        'listFormFilterByAppend' => 'array',
         'subject' => 'string',
     ];
 
@@ -50,6 +54,8 @@ class Resource extends OAA\Tag
         ?string $listFormClass = ListQueryType::class,
         ?array $listFormSortingFieldGroups = null,
         ?array $listFormSortingFieldAppend = null,
+        ?array $listFormFilterByGroups = null,
+        ?array $listFormFilterByAppend = null,
         ?string $subject = null,
         bool|string $tag = true,
         ?OA\ExternalDocumentation $externalDocs = null,
@@ -66,6 +72,8 @@ class Resource extends OAA\Tag
             'listFormClass' => $listFormClass ?? Generator::UNDEFINED,
             'listFormSortingFieldGroups' => $listFormSortingFieldGroups ?? Generator::UNDEFINED,
             'listFormSortingFieldAppend' => $listFormSortingFieldAppend ?? Generator::UNDEFINED,
+            'listFormFilterByGroups' => $listFormFilterByGroups ?? Generator::UNDEFINED,
+            'listFormFilterByAppend' => $listFormFilterByAppend ?? Generator::UNDEFINED,
             'x' => $x ?? Generator::UNDEFINED,
             'value' => $this->combine($externalDocs, $attachables),
         ];
