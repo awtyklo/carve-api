@@ -34,6 +34,32 @@ framework:
         circular_reference_handler: carve_api.serializer.circular_reference_handler
 ```
 
+Modify `src/Kernel.php` to override `FormModelDescriber` class.
+
+```php
+<?php
+
+namespace App;
+
+use Carve\ApiBundle\ModelDescriber\FormModelDescriber;
+use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+
+class Kernel extends BaseKernel implements CompilerPassInterface
+{
+    use MicroKernelTrait;
+
+    public function process(ContainerBuilder $container): void
+    {
+        $formModelDescriberService = $container->getDefinition('nelmio_api_doc.model_describers.form');
+        $formModelDescriberService->setClass(FormModelDescriber::class);
+    }
+}
+
+```
+
 ## Local development
 
 Add to `composer.json` in your project following lines:
