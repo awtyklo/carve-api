@@ -202,6 +202,14 @@ abstract class AbstractApiController extends AbstractFOSRestController
                 $queryBuilder->andWhere($filterAlias.'.'.$filterBy.' LIKE :'.$filterParameter);
                 $queryBuilder->setParameter($filterParameter, '%'.$filterValue.'%');
                 break;
+            case ListQueryFilterType::STARTSWITH:
+                $queryBuilder->andWhere($filterAlias.'.'.$filterBy.' LIKE :'.$filterParameter);
+                $queryBuilder->setParameter($filterParameter, $filterValue.'%');
+                break;
+            case ListQueryFilterType::ENDSWITH:
+                $queryBuilder->andWhere($filterAlias.'.'.$filterBy.' LIKE :'.$filterParameter);
+                $queryBuilder->setParameter($filterParameter, '%'.$filterValue);
+                break;
             case ListQueryFilterType::GREATERTHAN:
             case ListQueryFilterType::DATEGREATERTHAN:
             case ListQueryFilterType::DATETIMEGREATERTHAN:
@@ -379,26 +387,41 @@ abstract class AbstractApiController extends AbstractFOSRestController
     protected function getDefaultListFormOptions(): array
     {
         $class = $this->getClass();
+        $defaultSerializerGroups = $this->getSerializerGroups();
 
         $sortingSerializerGroups = $this->getApiResourceAttributeArgument('listFormSortingFieldGroups');
         if (null === $sortingSerializerGroups) {
-            $sortingDefaultSerializerGroups = $this->getSerializerGroups();
-
-            if (null !== $sortingDefaultSerializerGroups) {
-                $sortingSerializerGroups = AbstractApiController::normalizeSortingDefaultSerializerGroups($sortingDefaultSerializerGroups);
+            if (null !== $defaultSerializerGroups) {
+                $sortingSerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
             }
         }
 
         $sortingFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $sortingSerializerGroups]);
         $sortingFieldAppend = $this->getApiResourceAttributeArgument('listFormSortingFieldAppend');
         if (null !== $sortingFieldAppend) {
-            $sortingFieldChoices = AbstractApiController::appendSortingField($sortingFieldChoices, $sortingFieldAppend);
+            $sortingFieldChoices = AbstractApiController::appendFieldChoice($sortingFieldChoices, $sortingFieldAppend);
         }
 
-        return ['sorting_field_choices' => $sortingFieldChoices];
+        $filterBySerializerGroups = $this->getApiResourceAttributeArgument('listFormFilterByGroups');
+        if (null === $filterBySerializerGroups) {
+            if (null !== $defaultSerializerGroups) {
+                $filterBySerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
+            }
+        }
+
+        $filterByChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $filterBySerializerGroups]);
+        $filterByAppend = $this->getApiResourceAttributeArgument('listFormFilterByAppend');
+        if (null !== $filterByAppend) {
+            $filterByChoices = AbstractApiController::appendFieldChoice($filterByChoices, $filterByAppend);
+        }
+
+        return [
+            'sorting_field_choices' => $sortingFieldChoices,
+            'filter_filterBy_choices' => $filterByChoices,
+        ];
     }
 
-    public static function normalizeSortingDefaultSerializerGroups(array $serializerGroups)
+    public static function normalizeDefaultSerializerGroups(array $serializerGroups): array
     {
         // Replace serializer group 'identification' with 'id', when using default serializer groups
         $identificationKey = array_search('identification', $serializerGroups);
@@ -415,8 +438,8 @@ abstract class AbstractApiController extends AbstractFOSRestController
         return $serializerGroups;
     }
 
-    public static function appendSortingField(array $sortingFieldChoices, array $sortingFieldAppend)
+    public static function appendFieldChoice(array $fieldChoices, array $fieldChoicesAppend): array
     {
-        return array_unique(array_merge($sortingFieldChoices, $sortingFieldAppend));
+        return array_unique(array_merge($fieldChoices, $fieldChoicesAppend));
     }
 }
