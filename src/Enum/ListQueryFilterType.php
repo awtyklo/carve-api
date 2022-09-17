@@ -10,6 +10,8 @@ enum ListQueryFilterType: string
     case EQUAL = 'equal';
     case EQUALMULTIPLE = 'equalMultiple';
     case LIKE = 'like';
+    case STARTSWITH = 'startsWith';
+    case ENDSWITH = 'endsWith';
     case GREATERTHAN = 'greaterThan';
     case GREATERTHANOREQUAL = 'greaterThanOrEqual';
     case LESSTHAN = 'lessThan';

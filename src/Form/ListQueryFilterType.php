@@ -68,6 +68,8 @@ class ListQueryFilterType extends AbstractType
                 break;
             case ListQueryFilterTypeEnum::EQUAL:
             case ListQueryFilterTypeEnum::LIKE:
+            case ListQueryFilterTypeEnum::STARTSWITH:
+            case ListQueryFilterTypeEnum::ENDSWITH:
                 $form->add('filterValue', TextType::class, $options);
                 break;
             case ListQueryFilterTypeEnum::EQUALMULTIPLE:

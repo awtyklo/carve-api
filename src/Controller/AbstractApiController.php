@@ -202,6 +202,14 @@ abstract class AbstractApiController extends AbstractFOSRestController
                 $queryBuilder->andWhere($filterAlias.'.'.$filterBy.' LIKE :'.$filterParameter);
                 $queryBuilder->setParameter($filterParameter, '%'.$filterValue.'%');
                 break;
+            case ListQueryFilterType::STARTSWITH:
+                $queryBuilder->andWhere($filterAlias.'.'.$filterBy.' LIKE :'.$filterParameter);
+                $queryBuilder->setParameter($filterParameter, $filterValue.'%');
+                break;
+            case ListQueryFilterType::ENDSWITH:
+                $queryBuilder->andWhere($filterAlias.'.'.$filterBy.' LIKE :'.$filterParameter);
+                $queryBuilder->setParameter($filterParameter, '%'.$filterValue);
+                break;
             case ListQueryFilterType::GREATERTHAN:
             case ListQueryFilterType::DATEGREATERTHAN:
             case ListQueryFilterType::DATETIMEGREATERTHAN:
