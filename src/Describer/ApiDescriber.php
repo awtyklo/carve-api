@@ -112,18 +112,8 @@ class ApiDescriber implements RouteDescriberInterface
             }
 
             $response->description = 'Returns created '.$this->getSubjectLower($reflectionMethod);
-
             // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
-            foreach ($response->_unmerged as $unmerged) {
-                if ($unmerged instanceof NA\Model) {
-                    $unmerged->type = $this->getClass($reflectionMethod);
-
-                    $serializerGroups = $this->getSerializerGroups($reflectionMethod);
-                    if (null !== $serializerGroups) {
-                        $unmerged->groups = $serializerGroups;
-                    }
-                }
-            }
+            $response->_unmerged[] = new NA\Model(type: $this->getClass($reflectionMethod), groups: $this->getSerializerGroups($reflectionMethod));
         }
     }
 
@@ -218,18 +208,8 @@ class ApiDescriber implements RouteDescriberInterface
             }
 
             $response->description = 'Returns edited '.$this->getSubjectLower($reflectionMethod);
-
             // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
-            foreach ($response->_unmerged as $unmerged) {
-                if ($unmerged instanceof NA\Model) {
-                    $unmerged->type = $this->getClass($reflectionMethod);
-
-                    $serializerGroups = $this->getSerializerGroups($reflectionMethod);
-                    if (null !== $serializerGroups) {
-                        $unmerged->groups = $serializerGroups;
-                    }
-                }
-            }
+            $response->_unmerged[] = new NA\Model(type: $this->getClass($reflectionMethod), groups: $this->getSerializerGroups($reflectionMethod));
         }
     }
 
@@ -269,18 +249,8 @@ class ApiDescriber implements RouteDescriberInterface
             }
 
             $response->description = 'Returns '.$this->getSubjectLower($reflectionMethod);
-
             // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
-            foreach ($response->_unmerged as $unmerged) {
-                if ($unmerged instanceof NA\Model) {
-                    $unmerged->type = $this->getClass($reflectionMethod);
-
-                    $serializerGroups = $this->getSerializerGroups($reflectionMethod);
-                    if (null !== $serializerGroups) {
-                        $unmerged->groups = $serializerGroups;
-                    }
-                }
-            }
+            $response->_unmerged[] = new NA\Model(type: $this->getClass($reflectionMethod), groups: $this->getSerializerGroups($reflectionMethod));
         }
     }
 
