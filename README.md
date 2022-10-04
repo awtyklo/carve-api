@@ -18,6 +18,15 @@ Build with:
 
 ## Configuration
 
+Add in `config/packages/doctrine.yaml`. It will enable storing `Types::DATETIME_MUTABLE` always in UTC timezone.
+
+```yaml
+doctrine:
+    dbal:
+        types:
+            datetime: Carve\ApiBundle\DBAL\Types\UTCDateTimeType
+```
+
 Add in `config/services.yaml`.
 
 ```yaml
