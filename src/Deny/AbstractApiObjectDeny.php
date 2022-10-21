@@ -10,18 +10,21 @@ abstract class AbstractApiObjectDeny extends AbstractObjectDeny
     public const EDIT = 'edit';
     public const DELETE = 'delete';
 
+    protected function getAllowedMissingMethodDenyKeys(): array
+    {
+        return [
+            self::GET,
+            self::EDIT,
+            self::DELETE,
+        ];
+    }
+
     public function deny(string $denyKey, object $object): ?string
     {
         $method = $denyKey.'Deny';
         if (!method_exists($this, $method)) {
             // We will allow skiping definition of deny methods for predefined denyKeys
-            $allowedMissingMethodDenyKeys = [
-                self::GET,
-                self::EDIT,
-                self::DELETE,
-            ];
-
-            if (in_array($denyKey, $allowedMissingMethodDenyKeys)) {
+            if (in_array($denyKey, $this->getAllowedMissingMethodDenyKeys())) {
                 // In such case we will return null by default
                 return null;
             }
