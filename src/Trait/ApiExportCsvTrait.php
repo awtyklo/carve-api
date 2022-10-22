@@ -6,6 +6,7 @@ namespace Carve\ApiBundle\Trait;
 
 use Carve\ApiBundle\Attribute as Api;
 use Carve\ApiBundle\Model\ExportCsvQueryInterface;
+use Carve\ApiBundle\View\ExportCsvView;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,24 +39,6 @@ trait ApiExportCsvTrait
         $queryBuilder = $this->getExportQueryBuilder($exportCsvQuery);
         $results = $queryBuilder->getQuery()->getResult();
 
-        dump($exportCsvQuery->getFields());
-        // TODO Change it to maybye array_map
-        $labels = array_column($exportCsvQuery->getFields(), 'label');
-        $fields = array_column($exportCsvQuery->getFields(), 'field');
-
-        dump($labels);
-        dump($fields);
-
-        dump($results);
-
-        // TODO Build array for CSV based on $results
-        // TODO Figure out a way to handle relations (i.e. manytoone)
-        // TODO Figure out a way to handle enums
-        // TODO Figure out a way to handle custom cases (override)
-
-        // TODO Generate CSV
-
-        // TODO Return file with $this->file (probably)
-        return 'hello';
+        return new ExportCsvView($results, $exportCsvQuery->getFields(), $exportCsvQuery->getFilename());
     }
 }

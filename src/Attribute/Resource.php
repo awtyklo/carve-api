@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Carve\ApiBundle\Attribute;
 
 use Carve\ApiBundle\Form\ExportCsvQueryType;
+use Carve\ApiBundle\Form\ExportExcelQueryType;
 use Carve\ApiBundle\Form\ListQueryType;
 use OpenApi\Annotations as OAA;
 use OpenApi\Attributes as OA;
@@ -25,6 +26,7 @@ class Resource extends OAA\Tag
     public $listFormFilterByGroups = Generator::UNDEFINED;
     public $listFormFilterByAppend = Generator::UNDEFINED;
     public $exportCsvFormClass = Generator::UNDEFINED;
+    public $exportExcelFormClass = Generator::UNDEFINED;
     public $subject = Generator::UNDEFINED;
 
     /**
@@ -46,6 +48,7 @@ class Resource extends OAA\Tag
         'listFormFilterByGroups' => 'array',
         'listFormFilterByAppend' => 'array',
         'exportCsvFormClass' => 'string',
+        'exportExcelFormClass' => 'string',
         'subject' => 'string',
     ];
 
@@ -60,6 +63,7 @@ class Resource extends OAA\Tag
         ?array $listFormFilterByGroups = null,
         ?array $listFormFilterByAppend = null,
         ?string $exportCsvFormClass = ExportCsvQueryType::class,
+        ?string $exportExcelFormClass = ExportExcelQueryType::class,
         ?string $subject = null,
         bool|string $tag = true,
         ?OA\ExternalDocumentation $externalDocs = null,
@@ -79,6 +83,7 @@ class Resource extends OAA\Tag
             'listFormFilterByGroups' => $listFormFilterByGroups ?? Generator::UNDEFINED,
             'listFormFilterByAppend' => $listFormFilterByAppend ?? Generator::UNDEFINED,
             'exportCsvFormClass' => $exportCsvFormClass ?? Generator::UNDEFINED,
+            'exportExcelFormClass' => $exportExcelFormClass ?? Generator::UNDEFINED,
             'x' => $x ?? Generator::UNDEFINED,
             'value' => $this->combine($externalDocs, $attachables),
         ];
