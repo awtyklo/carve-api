@@ -130,8 +130,6 @@ final class FormModelDescriber implements ModelDescriberInterface, ModelRegistry
                 $config->getOptions()
             );
 
-            dump('HI');
-
             $ref = $this->modelRegistry->register($model);
             // We need to use allOf for description and title to be displayed
             if ($config->hasOption('documentation') && !empty($config->getOption('documentation'))) {
