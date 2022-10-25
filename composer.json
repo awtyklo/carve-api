@@ -26,7 +26,8 @@
         "symfony/property-access": "5.4.*",
         "symfony/validator": "5.4.*",
         "doctrine/orm": "^2.11",
-        "sensio/framework-extra-bundle": "^6.2"
+        "sensio/framework-extra-bundle": "^6.2",
+        "phpoffice/phpspreadsheet": "^1.25"
     },
     "autoload": {
         "psr-4": {
