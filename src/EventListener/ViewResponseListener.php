@@ -2,6 +2,7 @@
 
 namespace Carve\ApiBundle\EventListener;
 
+use Carve\ApiBundle\Serializer\Normalizer\ExportEnumNormalizer;
 use Carve\ApiBundle\View\ExportCsvView;
 use Carve\ApiBundle\View\ExportExcelView;
 use FOS\RestBundle\Controller\Annotations\View as ViewAnnotation;
@@ -86,6 +87,8 @@ class ViewResponseListener implements EventSubscriberInterface
         if (null !== $exportView) {
             // Force json format when handling export view
             $view->setFormat('json');
+            // Extend groups with a custom 'special:export' group when handling export view
+            $context->setGroups(array_merge($context->getGroups(), [ExportEnumNormalizer::EXPORT_GROUP]));
         }
 
         $response = $this->viewHandler->handle($view, $request);
@@ -102,9 +105,6 @@ class ViewResponseListener implements EventSubscriberInterface
         $results = $this->filterExportResults($exportView->getFields(), $results);
         $results = $this->normalizeExportResults($results);
         array_unshift($results, $this->getExportLabels($exportView->getFields()));
-
-        // TODO Figure out a way to handle enums
-        // TODO Figure out a way to handle custom cases (override, callbacks)
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -146,11 +146,14 @@ class ViewResponseListener implements EventSubscriberInterface
             return $field->getField();
         }, $fields);
 
-        // array_intersect_key uses keys. We need to convert array to have field names in keys.
-        $fieldNames = array_flip($fieldNames);
-
         return array_map(function ($result) use ($fieldNames) {
-            return array_intersect_key($result, $fieldNames);
+            $exportResult = [];
+            // In case of optimizing remember that $result and $fieldNames may have keys in different order
+            foreach ($fieldNames as $fieldName) {
+                $exportResult[$fieldName] = $result[$fieldName] ?? null;
+            }
+
+            return $exportResult;
         }, $results);
     }
 
