@@ -77,6 +77,54 @@ class Kernel extends BaseKernel implements CompilerPassInterface
 
 ```
 
+## Export (CSV and Excel)
+
+When using `Carve\ApiBundle\EventListener\ViewResponseListener` and returning `Carve\ApiBundle\View\ExportCsvView` or `Carve\ApiBundle\View\ExportExcelView` from controller, the results will be automatically serialized and returned to as a `csv` or `xlsx` file.
+
+Example usage:
+
+```php
+    use Carve\ApiBundle\View\ExportCsvView;
+    use Carve\ApiBundle\Model\ExportQueryField;
+    // ...
+    public function customExportAction()
+    {
+        $results = $this->getRepository(Task::class)->findAll();
+        $fields = [];
+
+        // fields will most likely come from a POST request
+        $field = new ExportQueryField();
+        // What field should be included in the export
+        $field->setField('name');
+        // What label should be added for this field
+        $field->setLabel('Name');
+        $fields[] = $field;
+
+        $filename = 'custom_export.csv';
+
+        return new ExportCsvView($results, $fields, $filename);
+    }
+```
+
+### Enums translation
+
+By default every enum in export will be translated. The structure of translation string looks like this: `enum.entityName.fieldName.enumValue`. You can override the prefix by adding an `Carve\ApiBundle\Attribute\Export\ExportEnumPrefix` attribute.
+
+In example below, translated string would be `enum.common.sourceType.enumValue`.
+
+```php
+    /**
+     * Source type (upload or external url).
+     */
+    #[ExportEnumPrefix('enum.common.sourceType.')]
+    #[ORM\Column(type: Types::STRING, enumType: SourceType::class)]
+    private ?SourceType $sourceType = null;
+```
+
+### Export customization
+
+You can customize common export cases by using similar pattern as `Carve\ApiBundle\Serializer\ExportEnumNormalizer`.
+
 ## Local development
 
 Add to `composer.json` in your project following lines:
