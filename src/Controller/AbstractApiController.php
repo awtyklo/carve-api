@@ -417,7 +417,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
         return null;
     }
 
-    protected function getDefaultListFormOptions(): array
+    protected function getSortingFieldChoices(): array
     {
         $class = $this->getClass();
         $defaultSerializerGroups = $this->getSerializerGroups();
@@ -435,6 +435,14 @@ abstract class AbstractApiController extends AbstractFOSRestController
             $sortingFieldChoices = AbstractApiController::appendFieldChoice($sortingFieldChoices, $sortingFieldAppend);
         }
 
+        return $sortingFieldChoices;
+    }
+
+    protected function getFilterFilterByChoices(): array
+    {
+        $class = $this->getClass();
+        $defaultSerializerGroups = $this->getSerializerGroups();
+
         $filterBySerializerGroups = $this->getApiResourceAttributeArgument('listFormFilterByGroups');
         if (null === $filterBySerializerGroups) {
             if (null !== $defaultSerializerGroups) {
@@ -448,95 +456,54 @@ abstract class AbstractApiController extends AbstractFOSRestController
             $filterByChoices = AbstractApiController::appendFieldChoice($filterByChoices, $filterByAppend);
         }
 
+        return $filterByChoices;
+    }
+
+    protected function getFieldsFieldChoices(): array
+    {
+        $class = $this->getClass();
+        $defaultSerializerGroups = $this->getSerializerGroups();
+
+        $fieldSerializerGroups = $this->getApiResourceAttributeArgument('exportFormFieldGroups');
+        if (null === $fieldSerializerGroups) {
+            if (null !== $defaultSerializerGroups) {
+                // We do not need to apply normalizeDefaultSerializerGroups here
+                $fieldSerializerGroups = $defaultSerializerGroups;
+            }
+        }
+
+        $fieldsFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $fieldSerializerGroups]);
+        $fieldAppendChoices = $this->getApiResourceAttributeArgument('exportFormFieldAppend');
+        if (null !== $fieldAppendChoices) {
+            $fieldsFieldChoices = AbstractApiController::appendFieldChoice($fieldsFieldChoices, $fieldAppendChoices);
+        }
+
+        return $fieldsFieldChoices;
+    }
+
+    protected function getDefaultListFormOptions(): array
+    {
         return [
-            'sorting_field_choices' => $sortingFieldChoices,
-            'filter_filterBy_choices' => $filterByChoices,
+            'sorting_field_choices' => $this->getSortingFieldChoices(),
+            'filter_filterBy_choices' => $this->getFilterFilterByChoices(),
         ];
     }
 
     protected function getDefaultExportCsvFormOptions(): array
     {
-        $class = $this->getClass();
-        $defaultSerializerGroups = $this->getSerializerGroups();
-
-        // TODO Maybye use that directly from getDefaultListFormOptions()
-        $sortingSerializerGroups = $this->getApiResourceAttributeArgument('listFormSortingFieldGroups');
-        if (null === $sortingSerializerGroups) {
-            if (null !== $defaultSerializerGroups) {
-                $sortingSerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
-            }
-        }
-
-        $sortingFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $sortingSerializerGroups]);
-        $sortingFieldAppend = $this->getApiResourceAttributeArgument('listFormSortingFieldAppend');
-        if (null !== $sortingFieldAppend) {
-            $sortingFieldChoices = AbstractApiController::appendFieldChoice($sortingFieldChoices, $sortingFieldAppend);
-        }
-
-        $filterBySerializerGroups = $this->getApiResourceAttributeArgument('listFormFilterByGroups');
-        if (null === $filterBySerializerGroups) {
-            if (null !== $defaultSerializerGroups) {
-                $filterBySerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
-            }
-        }
-
-        $filterByChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $filterBySerializerGroups]);
-        $filterByAppend = $this->getApiResourceAttributeArgument('listFormFilterByAppend');
-        if (null !== $filterByAppend) {
-            $filterByChoices = AbstractApiController::appendFieldChoice($filterByChoices, $filterByAppend);
-        }
-
-        // TODO this function fields_field_choices use similarly
-        $test = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
-        $fieldsFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $test]);
-
         return [
-            'sorting_field_choices' => $sortingFieldChoices,
-            'filter_filterBy_choices' => $filterByChoices,
-            'fields_field_choices' => $fieldsFieldChoices,
+            'sorting_field_choices' => $this->getSortingFieldChoices(),
+            'filter_filterBy_choices' => $this->getFilterFilterByChoices(),
+            'fields_field_choices' => $this->getFieldsFieldChoices(),
         ];
     }
 
     protected function getDefaultExportExcelFormOptions(): array
     {
-        $class = $this->getClass();
-        $defaultSerializerGroups = $this->getSerializerGroups();
-
-        // TODO Maybye use that directly from getDefaultListFormOptions()
-        $sortingSerializerGroups = $this->getApiResourceAttributeArgument('listFormSortingFieldGroups');
-        if (null === $sortingSerializerGroups) {
-            if (null !== $defaultSerializerGroups) {
-                $sortingSerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
-            }
-        }
-
-        $sortingFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $sortingSerializerGroups]);
-        $sortingFieldAppend = $this->getApiResourceAttributeArgument('listFormSortingFieldAppend');
-        if (null !== $sortingFieldAppend) {
-            $sortingFieldChoices = AbstractApiController::appendFieldChoice($sortingFieldChoices, $sortingFieldAppend);
-        }
-
-        $filterBySerializerGroups = $this->getApiResourceAttributeArgument('listFormFilterByGroups');
-        if (null === $filterBySerializerGroups) {
-            if (null !== $defaultSerializerGroups) {
-                $filterBySerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
-            }
-        }
-
-        $filterByChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $filterBySerializerGroups]);
-        $filterByAppend = $this->getApiResourceAttributeArgument('listFormFilterByAppend');
-        if (null !== $filterByAppend) {
-            $filterByChoices = AbstractApiController::appendFieldChoice($filterByChoices, $filterByAppend);
-        }
-
-        // TODO this function fields_field_choices use similarly
-        $test = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
-        $fieldsFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $test]);
-
         return [
-            'sorting_field_choices' => $sortingFieldChoices,
-            'filter_filterBy_choices' => $filterByChoices,
-            'fields_field_choices' => $fieldsFieldChoices,
+            'sorting_field_choices' => $this->getSortingFieldChoices(),
+            'filter_filterBy_choices' => $this->getFilterFilterByChoices(),
+            'fields_field_choices' => $this->getFieldsFieldChoices(),
         ];
     }
 

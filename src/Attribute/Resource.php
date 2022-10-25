@@ -27,6 +27,8 @@ class Resource extends OAA\Tag
     public $listFormFilterByAppend = Generator::UNDEFINED;
     public $exportCsvFormClass = Generator::UNDEFINED;
     public $exportExcelFormClass = Generator::UNDEFINED;
+    public $exportFormFieldGroups = Generator::UNDEFINED;
+    public $exportFormFieldAppend = Generator::UNDEFINED;
     public $subject = Generator::UNDEFINED;
 
     /**
@@ -49,6 +51,8 @@ class Resource extends OAA\Tag
         'listFormFilterByAppend' => 'array',
         'exportCsvFormClass' => 'string',
         'exportExcelFormClass' => 'string',
+        'exportFormFieldGroups' => 'array',
+        'exportFormFieldAppend' => 'array',
         'subject' => 'string',
     ];
 
@@ -64,6 +68,8 @@ class Resource extends OAA\Tag
         ?array $listFormFilterByAppend = null,
         ?string $exportCsvFormClass = ExportCsvQueryType::class,
         ?string $exportExcelFormClass = ExportExcelQueryType::class,
+        ?array $exportFormFieldGroups = null,
+        ?array $exportFormFieldAppend = null,
         ?string $subject = null,
         bool|string $tag = true,
         ?OA\ExternalDocumentation $externalDocs = null,
@@ -84,6 +90,8 @@ class Resource extends OAA\Tag
             'listFormFilterByAppend' => $listFormFilterByAppend ?? Generator::UNDEFINED,
             'exportCsvFormClass' => $exportCsvFormClass ?? Generator::UNDEFINED,
             'exportExcelFormClass' => $exportExcelFormClass ?? Generator::UNDEFINED,
+            'exportFormFieldGroups' => $exportFormFieldGroups ?? Generator::UNDEFINED,
+            'exportFormFieldAppend' => $exportFormFieldAppend ?? Generator::UNDEFINED,
             'x' => $x ?? Generator::UNDEFINED,
             'value' => $this->combine($externalDocs, $attachables),
         ];
