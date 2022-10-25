@@ -27,7 +27,7 @@ doctrine:
             datetime: Carve\ApiBundle\DBAL\Types\UTCDateTimeType
 ```
 
-Add in `config/services.yaml`.
+Add in `config/services.yaml`. It will override default FormErrorNormalizer to additionally pass parameters from error messages.
 
 ```yaml
 services:
@@ -35,7 +35,15 @@ services:
         class: Carve\ApiBundle\Serializer\Normalizer\FormErrorNormalizer
 ```
 
-Add in `config/packages/framework.yaml`.
+Add in `config/services.yaml`. It will override default ViewResponseListener to additionally handle exporting views.
+
+```yaml
+services:
+    fos_rest.view_response_listener:
+        class: Carve\ApiBundle\EventListener\ViewResponseListener
+```
+
+Add in `config/packages/framework.yaml`. It will add default circular reference handling.
 
 ```yaml
 framework:
