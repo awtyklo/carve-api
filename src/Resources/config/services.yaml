@@ -8,6 +8,14 @@ services:
     carve_api.serializer.circular_reference_handler:
         class: Carve\ApiBundle\Serializer\CircularReferenceHandler
 
+    carve_api.serializer.normalizer.export_enum_normalizer:
+        class: Carve\ApiBundle\Serializer\Normalizer\ExportEnumNormalizer
+        arguments:
+            - "@serializer.normalizer.object"
+            - "@doctrine"
+            - "@translator"
+        tags: ["serializer.normalizer"]
+
     carve_api.form.type_guesser.doctrine_enum_type_guesser:
         class: Carve\ApiBundle\Form\TypeGuesser\DoctrineEnumTypeGuesser
         arguments:

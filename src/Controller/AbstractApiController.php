@@ -6,6 +6,7 @@ namespace Carve\ApiBundle\Controller;
 
 use Carve\ApiBundle\Attribute as Api;
 use Carve\ApiBundle\Enum\ListQueryFilterType;
+use Carve\ApiBundle\Model\ExportQueryInterface;
 use Carve\ApiBundle\Model\ListQueryFilterInterface;
 use Carve\ApiBundle\Model\ListQueryInterface;
 use Carve\ApiBundle\Model\ListQuerySortingInterface;
@@ -73,6 +74,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
         return $object;
     }
 
+    // TODO ListQueryInterface $listQuery is not a valid interface here. Rethink and fix after batch actions are ready
     protected function getListQueryBuilder(ListQueryInterface $listQuery, callable $modifyQueryBuilder = null, string $alias = 'o'): QueryBuilder
     {
         $queryBuilder = $this->getQueryBuilder($modifyQueryBuilder, $alias);
@@ -92,6 +94,17 @@ abstract class AbstractApiController extends AbstractFOSRestController
         $rowsPerPage = $listQuery->getRowsPerPage() ?? 10;
         $queryBuilder->setFirstResult(($page - 1) * $rowsPerPage);
         $queryBuilder->setMaxResults($rowsPerPage);
+
+        return $queryBuilder;
+    }
+
+    protected function getExportQueryBuilder(ExportQueryInterface $exportQuery, callable $modifyQueryBuilder = null, string $alias = 'o'): QueryBuilder
+    {
+        $queryBuilder = $this->getQueryBuilder($modifyQueryBuilder, $alias);
+        $queryBuilder->distinct();
+
+        $this->applyListQuerySorting($exportQuery->getSorting(), $queryBuilder, $alias);
+        $this->applyListQueryFilters($exportQuery->getFilters(), $queryBuilder, $alias);
 
         return $queryBuilder;
     }
@@ -304,6 +317,26 @@ abstract class AbstractApiController extends AbstractFOSRestController
         return $listFormClass;
     }
 
+    protected function getExportCsvFormClass(): string
+    {
+        $exportCsvFormClass = $this->getApiResourceAttributeArgument('exportCsvFormClass');
+        if (null === $exportCsvFormClass) {
+            throw new \Exception('Argument "exportCsvFormClass" not defined. Please define it in "Api\Resource" attribute');
+        }
+
+        return $exportCsvFormClass;
+    }
+
+    protected function getExportExcelFormClass(): string
+    {
+        $exportExcelFormClass = $this->getApiResourceAttributeArgument('exportExcelFormClass');
+        if (null === $exportExcelFormClass) {
+            throw new \Exception('Argument "exportExcelFormClass" not defined. Please define it in "Api\Resource" attribute');
+        }
+
+        return $exportExcelFormClass;
+    }
+
     protected function hasDenyClass(): bool
     {
         if (null === $this->getDenyClass()) {
@@ -384,7 +417,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
         return null;
     }
 
-    protected function getDefaultListFormOptions(): array
+    protected function getSortingFieldChoices(): array
     {
         $class = $this->getClass();
         $defaultSerializerGroups = $this->getSerializerGroups();
@@ -402,6 +435,14 @@ abstract class AbstractApiController extends AbstractFOSRestController
             $sortingFieldChoices = AbstractApiController::appendFieldChoice($sortingFieldChoices, $sortingFieldAppend);
         }
 
+        return $sortingFieldChoices;
+    }
+
+    protected function getFilterFilterByChoices(): array
+    {
+        $class = $this->getClass();
+        $defaultSerializerGroups = $this->getSerializerGroups();
+
         $filterBySerializerGroups = $this->getApiResourceAttributeArgument('listFormFilterByGroups');
         if (null === $filterBySerializerGroups) {
             if (null !== $defaultSerializerGroups) {
@@ -415,9 +456,54 @@ abstract class AbstractApiController extends AbstractFOSRestController
             $filterByChoices = AbstractApiController::appendFieldChoice($filterByChoices, $filterByAppend);
         }
 
+        return $filterByChoices;
+    }
+
+    protected function getFieldsFieldChoices(): array
+    {
+        $class = $this->getClass();
+        $defaultSerializerGroups = $this->getSerializerGroups();
+
+        $fieldSerializerGroups = $this->getApiResourceAttributeArgument('exportFormFieldGroups');
+        if (null === $fieldSerializerGroups) {
+            if (null !== $defaultSerializerGroups) {
+                // We do not need to apply normalizeDefaultSerializerGroups here
+                $fieldSerializerGroups = $defaultSerializerGroups;
+            }
+        }
+
+        $fieldsFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $fieldSerializerGroups]);
+        $fieldAppendChoices = $this->getApiResourceAttributeArgument('exportFormFieldAppend');
+        if (null !== $fieldAppendChoices) {
+            $fieldsFieldChoices = AbstractApiController::appendFieldChoice($fieldsFieldChoices, $fieldAppendChoices);
+        }
+
+        return $fieldsFieldChoices;
+    }
+
+    protected function getDefaultListFormOptions(): array
+    {
         return [
-            'sorting_field_choices' => $sortingFieldChoices,
-            'filter_filterBy_choices' => $filterByChoices,
+            'sorting_field_choices' => $this->getSortingFieldChoices(),
+            'filter_filterBy_choices' => $this->getFilterFilterByChoices(),
+        ];
+    }
+
+    protected function getDefaultExportCsvFormOptions(): array
+    {
+        return [
+            'sorting_field_choices' => $this->getSortingFieldChoices(),
+            'filter_filterBy_choices' => $this->getFilterFilterByChoices(),
+            'fields_field_choices' => $this->getFieldsFieldChoices(),
+        ];
+    }
+
+    protected function getDefaultExportExcelFormOptions(): array
+    {
+        return [
+            'sorting_field_choices' => $this->getSortingFieldChoices(),
+            'filter_filterBy_choices' => $this->getFilterFilterByChoices(),
+            'fields_field_choices' => $this->getFieldsFieldChoices(),
         ];
     }
 

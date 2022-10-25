@@ -21,6 +21,12 @@
         "choice": "This is not a valid choice",
         "dateModifier": "Invalid date modifier format",
         "cssColor": "This value is not a valid CSS color",
-        "uniqueEntity": "This value is already used"
+        "uniqueEntity": "This value is already used",
+        "exportExcel": {
+            "sheetName": {
+                "tooLong": "Excel sheet name cannot exceed 30 characters",
+                "invalidCharacters": "Excel sheet name cannot contain special characters"
+            }
+        }
     }
 }

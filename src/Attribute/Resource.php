@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Carve\ApiBundle\Attribute;
 
+use Carve\ApiBundle\Form\ExportCsvQueryType;
+use Carve\ApiBundle\Form\ExportExcelQueryType;
 use Carve\ApiBundle\Form\ListQueryType;
 use OpenApi\Annotations as OAA;
 use OpenApi\Attributes as OA;
@@ -23,6 +25,10 @@ class Resource extends OAA\Tag
     public $listFormSortingFieldAppend = Generator::UNDEFINED;
     public $listFormFilterByGroups = Generator::UNDEFINED;
     public $listFormFilterByAppend = Generator::UNDEFINED;
+    public $exportCsvFormClass = Generator::UNDEFINED;
+    public $exportExcelFormClass = Generator::UNDEFINED;
+    public $exportFormFieldGroups = Generator::UNDEFINED;
+    public $exportFormFieldAppend = Generator::UNDEFINED;
     public $subject = Generator::UNDEFINED;
 
     /**
@@ -43,6 +49,10 @@ class Resource extends OAA\Tag
         'listFormSortingFieldAppend' => 'array',
         'listFormFilterByGroups' => 'array',
         'listFormFilterByAppend' => 'array',
+        'exportCsvFormClass' => 'string',
+        'exportExcelFormClass' => 'string',
+        'exportFormFieldGroups' => 'array',
+        'exportFormFieldAppend' => 'array',
         'subject' => 'string',
     ];
 
@@ -56,6 +66,10 @@ class Resource extends OAA\Tag
         ?array $listFormSortingFieldAppend = null,
         ?array $listFormFilterByGroups = null,
         ?array $listFormFilterByAppend = null,
+        ?string $exportCsvFormClass = ExportCsvQueryType::class,
+        ?string $exportExcelFormClass = ExportExcelQueryType::class,
+        ?array $exportFormFieldGroups = null,
+        ?array $exportFormFieldAppend = null,
         ?string $subject = null,
         bool|string $tag = true,
         ?OA\ExternalDocumentation $externalDocs = null,
@@ -74,6 +88,10 @@ class Resource extends OAA\Tag
             'listFormSortingFieldAppend' => $listFormSortingFieldAppend ?? Generator::UNDEFINED,
             'listFormFilterByGroups' => $listFormFilterByGroups ?? Generator::UNDEFINED,
             'listFormFilterByAppend' => $listFormFilterByAppend ?? Generator::UNDEFINED,
+            'exportCsvFormClass' => $exportCsvFormClass ?? Generator::UNDEFINED,
+            'exportExcelFormClass' => $exportExcelFormClass ?? Generator::UNDEFINED,
+            'exportFormFieldGroups' => $exportFormFieldGroups ?? Generator::UNDEFINED,
+            'exportFormFieldAppend' => $exportFormFieldAppend ?? Generator::UNDEFINED,
             'x' => $x ?? Generator::UNDEFINED,
             'value' => $this->combine($externalDocs, $attachables),
         ];
