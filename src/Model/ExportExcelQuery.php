@@ -21,7 +21,10 @@ class ExportExcelQuery implements ExportExcelQueryInterface
     private ?string $filename = null;
 
     #[Assert\NotBlank]
-    // TODO Validations (regex + length)
+    // Maximum name of a sheet in Excel is 30
+    #[Assert\Length(max: 30, maxMessage: 'validation.exportExcel.sheetName.tooLong')]
+    // Name of a sheet in Excel cannot contain special chars
+    #[Assert\Regex(pattern: '/[\*\:\/\\\?\[\]]/', match: false, message: 'validation.exportExcel.sheetName.invalidCharacters')]
     private ?string $sheetName = null;
 
     public function getSorting(): array
