@@ -157,11 +157,11 @@ abstract class AbstractApiController extends AbstractFOSRestController
         }
 
         if (in_array($filterType, [ListQueryFilterType::DATETIMEGREATERTHAN,  ListQueryFilterType::DATETIMEGREATERTHANOREQUAL, ListQueryFilterType::TIMEGREATERTHANOREQUAL, ListQueryFilterType::TIMEGREATERTHANOREQUAL])) {
-            $filterValue->setTime($filterValue->format('H'), $filterValue->format('i'), 0);
+            $filterValue->setTime((int) $filterValue->format('H'), (int) $filterValue->format('i'), 0);
         }
 
         if (in_array($filterType, [ListQueryFilterType::DATETIMELESSTHAN,  ListQueryFilterType::DATETIMELESSTHANOREQUAL, ListQueryFilterType::TIMELESSTHAN,  ListQueryFilterType::TIMELESSTHANOREQUAL])) {
-            $filterValue->setTime($filterValue->format('H'), $filterValue->format('i'), 59);
+            $filterValue->setTime((int) $filterValue->format('H'), (int) $filterValue->format('i'), 59);
         }
 
         if (in_array($filter->getFilterType(), [ListQueryFilterType::TIMEGREATERTHANOREQUAL, ListQueryFilterType::TIMEGREATERTHANOREQUAL, ListQueryFilterType::TIMELESSTHAN,  ListQueryFilterType::TIMELESSTHANOREQUAL])) {
