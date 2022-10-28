@@ -12,6 +12,7 @@
         "greaterThan": "This value should be greater than {{ compared_value }}",
         "greaterThanOrEqual": "This value should be greater than or equal {{ compared_value }}",
         "integer": "This value is not a valid integer",
+        "datetime": "This value is not a valid datetime value",
         "url": "This value is not a valid url",
         "rangeDateTime": "This is not a valid datetime value",
         "rangeNumber": "This is not a valid number",

@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping\ReflectionEnumProperty;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\Proxy;
+use ReflectionClass;
 use ReflectionProperty;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -105,7 +106,9 @@ class ExportEnumNormalizer implements ContextAwareNormalizerInterface
             return $attributeInstance->getPrefix();
         }
 
-        return 'enum.firmware.'.$property.'.';
+        $reflectionClass = new ReflectionClass($class);
+
+        return 'enum.'.strtolower($reflectionClass->getShortName()).'.'.$property.'.';
     }
 
     // Code below from Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser
