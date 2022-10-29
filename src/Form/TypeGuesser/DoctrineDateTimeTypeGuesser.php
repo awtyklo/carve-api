@@ -3,6 +3,7 @@
 namespace Carve\ApiBundle\Form\TypeGuesser;
 
 use Carve\ApiBundle\Form\Type\DateTimeType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\MappingException;
@@ -36,8 +37,8 @@ class DoctrineDateTimeTypeGuesser implements FormTypeGuesserInterface
         }
 
         switch ($metadata->getTypeOfField($property)) {
-            case Type::DATETIME:
-            case Type::DATETIMETZ:
+            case Types::DATETIME_MUTABLE:
+            case Types::DATETIMETZ_MUTABLE:
                 return new TypeGuess(DateTimeType::class, [], Guess::VERY_HIGH_CONFIDENCE);
         }
 
