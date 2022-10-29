@@ -27,12 +27,15 @@ class DoctrineEnumTypeGuesser implements FormTypeGuesserInterface
 
     public function guessType($class, $property): ?TypeGuess
     {
-        $ret = $this->getMetadata($class);
-        if (!$ret) {
+        if (!$ret = $this->getMetadata($class)) {
             return null;
         }
 
         [$metadata] = $ret;
+
+        if (!$metadata->hasField($property)) {
+            return null;
+        }
 
         $reflectionProperty = $metadata->getReflectionProperty($property);
         if ($reflectionProperty instanceof ReflectionEnumProperty) {

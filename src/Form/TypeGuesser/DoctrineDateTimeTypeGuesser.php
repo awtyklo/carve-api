@@ -30,7 +30,7 @@ class DoctrineDateTimeTypeGuesser implements FormTypeGuesserInterface
             return null;
         }
 
-        [$metadata, $name] = $ret;
+        [$metadata] = $ret;
 
         if ($metadata->hasAssociation($property)) {
             return null;
