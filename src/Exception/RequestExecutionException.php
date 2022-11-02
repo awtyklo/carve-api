@@ -13,7 +13,7 @@ class RequestExecutionException extends ConflictHttpException
      * @param \Throwable|null $previous The previous exception
      * @param int             $code     The internal exception code
      */
-    public function __construct(?string $errorMessage = null, array $errorParameters = [], string $message = 'request.executionError', \Throwable $previous = null, int $code = 0, array $headers = [])
+    public function __construct(?string $errorMessage = null, array $errorParameters = [], string $message = 'error.requestExecutionFailed', \Throwable $previous = null, int $code = 0, array $headers = [])
     {
         parent::__construct($message, $previous, $code, $headers);
 

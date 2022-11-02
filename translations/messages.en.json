@@ -1,4 +1,20 @@
 {
+    "error": {
+        "requestExecutionFailed": "Executed action has failed",
+        "unknownError": "Unknown error",
+        "title": {
+            "401": "Authorization required",
+            "404": "Page not found",
+            "403": "Insufficient credentials",
+            "500": "Error occured"
+        },
+        "body": {
+            "401": "Authorization is required to access this page.",
+            "403": "You are missing required credentials. Please try again or let us know how it happened.",
+            "404": "If you see this message after clicking on the link on our website, please let us know.",
+            "500": "Something went wrong. Please try again or let us know how it happened."
+        }
+    },
     "validation": {
         "required": "This value is required",
         "enum": "This is not a valid value",
