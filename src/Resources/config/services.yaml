@@ -1,4 +1,8 @@
 services:
+    carve.request_execution_exception_normalizer:
+        class: Carve\ApiBundle\Serializer\Normalizer\RequestExecutionExceptionNormalizer
+        tags: [serializer.normalizer]
+
     carve_api.describer.api_describer:
         class: Carve\ApiBundle\Describer\ApiDescriber
         arguments:
