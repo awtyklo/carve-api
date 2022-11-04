@@ -77,6 +77,44 @@ class Kernel extends BaseKernel implements CompilerPassInterface
 
 ```
 
+## Request execution error reporting
+
+When action execution in backend encouters error that should passed to user (inform user about error). Throw `RequestExecutionException`.
+The result will be returning 409 HTTP Code as:
+
+```
+{
+    "code":409,
+    "message":"error.requestExecutionFailed",
+    "errors":[
+        {"message":"functionality.error.somethingFailed","parameters":{"userName":"coolUser","areaNo":2}},
+        {"message":"functionality.error.somethingElseFailed","parameters":{"deviceId":123}}
+    ]
+}
+```
+
+`error.requestExecutionFailed` - is default message value - it can be changed by setting 3rd parameter in `RequestExecutionException` constructor.
+Constructor message (1st parameter) is added as first object in errors array, others can be added using addError method
+
+Example below:
+
+```
+$exception = new RequestExecutionException('functionality.error.somethingFailed', ['userName' => 'coolUser', 'areaNo' => 2]);
+$exception->addError('functionality.error.somethingElseFailed', ['deviceId' => 123]);
+throw $exception;
+```
+
+Another example:
+
+```
+throw new RequestExecutionException('functionality.error.somethingFailed', ['userName' => 'coolUser', 'areaNo' => 2]);
+```
+
+By default forge frontend `ErrorDialog` by using `handleCatch` and `ErrorContext` will show response in dialog.
+`message` (translated) will be used as dialog title, `errors` array will be shown as multiple `Alert`s with error serverity. Text will be translated using `message` as key and `parameters` as translation parameters.
+`ErrorDialog` needs to be added to application layout
+
+
 ## Export (CSV and Excel)
 
 When using `Carve\ApiBundle\EventListener\ViewResponseListener` and returning `Carve\ApiBundle\View\ExportCsvView` or `Carve\ApiBundle\View\ExportExcelView` from controller, the results will be automatically serialized and returned to as a `csv` or `xlsx` file.
