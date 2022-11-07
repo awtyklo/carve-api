@@ -14,6 +14,7 @@
         "integer": "This value is not a valid integer",
         "datetime": "This value is not a valid datetime value",
         "url": "This value is not a valid url",
+        "ip": "This value is not a valid IP address",
         "rangeDateTime": "This is not a valid datetime value",
         "rangeNumber": "This is not a valid number",
         "rangeMin": "This value should be {{ limit }} or less",
