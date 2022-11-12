@@ -24,6 +24,11 @@
         "dateModifier": "Invalid date modifier format",
         "cssColor": "This value is not a valid CSS color",
         "uniqueEntity": "This value is already used",
+        "unique": "This collection should contain only unique elements",
+        "countMin": "This collection should contain {{ limit }} element(s) or more",
+        "countMax": "This collection should contain {{ limit }} element(s) or less",
+        "countExact": "This collection should contain exactly {{ limit }} element(s)",
+        "countDivisibleBy": "The number of elements in this collection should be a multiple of {{ compared_value }}",
         "exportExcel": {
             "sheetName": {
                 "tooLong": "Excel sheet name cannot exceed 30 characters",
