@@ -1,4 +1,7 @@
 {
+    "error": {
+        "requestExecutionFailed": "Executed action has failed"
+    },
     "validation": {
         "required": "This value is required",
         "enum": "This is not a valid value",
