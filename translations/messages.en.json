@@ -1,6 +1,6 @@
 {
     "error": {
-        "requestExecutionFailed": "Executed action has failed"
+        "requestExecutionFailed": "Operation has failed"
     },
     "validation": {
         "required": "This value is required",
