@@ -60,7 +60,6 @@ class ListQueryFilterType extends AbstractType
                     break;
                 case ListQueryFilterTypeEnum::EQUALMULTIPLE:
                     $form->add('filterValue', CollectionType::class, [
-                        'entry_type' => ListQueryFiltersMultipleValueType::class,
                         'allow_add' => true,
                         'error_bubbling' => false,
                         'constraints' => [
