@@ -19,7 +19,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Count;
 
 class ListQueryFilterType extends AbstractType
 {
@@ -62,12 +61,6 @@ class ListQueryFilterType extends AbstractType
                     $form->add('filterValue', CollectionType::class, [
                         'allow_add' => true,
                         'error_bubbling' => false,
-                        'constraints' => [
-                            new Count([
-                                'min' => 1,
-                                'minMessage' => 'validation.required',
-                            ]),
-                        ],
                     ]);
                     break;
                 case ListQueryFilterTypeEnum::DATEGREATERTHAN:

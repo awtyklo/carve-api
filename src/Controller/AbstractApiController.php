@@ -128,12 +128,6 @@ abstract class AbstractApiController extends AbstractFOSRestController
             if (false === $skip) {
                 $filterValue = $filter->getFilterValue();
 
-                if (ListQueryFilterType::EQUALMULTIPLE === $filter->getFilterType()) {
-                    $filterValue = array_map(function ($nestedValue) {
-                        return $nestedValue['value'];
-                    }, $filterValue);
-                }
-
                 $filterParameter = str_replace('.', '_', $filter->getFilterBy().$key);
                 [$filterBy, $filterAlias] = $this->processFilterLeftJoin($filter, $queryBuilder, $alias, $leftJoinAliases);
 
@@ -204,12 +198,8 @@ abstract class AbstractApiController extends AbstractFOSRestController
                 }
                 break;
             case ListQueryFilterType::EQUALMULTIPLE:
-                if ($this->isManyToManyRelationship($filterBy)) {
-                    throw new \Exception('Not supported');
-                } else {
-                    $queryBuilder->andWhere($filterAlias.'.'.$filterBy.' IN (:'.$filterParameter.')');
-                    $queryBuilder->setParameter($filterParameter, $filterValue);
-                }
+                $queryBuilder->andWhere($filterAlias.'.'.$filterBy.' IN (:'.$filterParameter.')');
+                $queryBuilder->setParameter($filterParameter, $filterValue);
                 break;
             case ListQueryFilterType::LIKE:
                 $queryBuilder->andWhere($filterAlias.'.'.$filterBy.' LIKE :'.$filterParameter);
