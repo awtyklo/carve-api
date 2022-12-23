@@ -15,7 +15,6 @@ class ListQueryFilter implements ListQueryFilterInterface
     #[Assert\NotBlank]
     private ?ListQueryFilterType $filterType;
 
-    #[Assert\NotBlank]
     private $filterValue;
 
     public function getFilterBy(): ?string

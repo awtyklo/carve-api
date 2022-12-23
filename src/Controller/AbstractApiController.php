@@ -198,8 +198,11 @@ abstract class AbstractApiController extends AbstractFOSRestController
                 }
                 break;
             case ListQueryFilterType::EQUALMULTIPLE:
-                $queryBuilder->andWhere($filterAlias.'.'.$filterBy.' IN (:'.$filterParameter.')');
-                $queryBuilder->setParameter($filterParameter, $filterValue);
+                // Empty array is allowed as $filterValue for EQUALMULTIPLE
+                if (count($filterValue) > 0) {
+                    $queryBuilder->andWhere($filterAlias.'.'.$filterBy.' IN (:'.$filterParameter.')');
+                    $queryBuilder->setParameter($filterParameter, $filterValue);
+                }
                 break;
             case ListQueryFilterType::LIKE:
                 $queryBuilder->andWhere($filterAlias.'.'.$filterBy.' LIKE :'.$filterParameter);
