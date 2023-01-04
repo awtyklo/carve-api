@@ -35,7 +35,7 @@ abstract class AbstractApiObjectDeny extends AbstractObjectDeny
         return $this->$method($object);
     }
 
-    protected function modifyFillDenyResult(string $denyResult, string $denyKey, DenyInterface $object): string
+    public function getDenyResultLabel(string $denyResult, string $denyKey, DenyInterface $object): string
     {
         $reflectionClass = new \ReflectionClass($object);
 
