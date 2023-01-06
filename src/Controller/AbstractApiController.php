@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Carve\ApiBundle\Controller;
 
 use Carve\ApiBundle\Attribute as Api;
+use Carve\ApiBundle\Enum\BatchResultStatus;
 use Carve\ApiBundle\Enum\ListQueryFilterType;
+use Carve\ApiBundle\Model\BatchQueryInterface;
+use Carve\ApiBundle\Model\BatchResult;
 use Carve\ApiBundle\Model\ExportQueryInterface;
 use Carve\ApiBundle\Model\ListQueryFilterInterface;
 use Carve\ApiBundle\Model\ListQueryInterface;
@@ -18,6 +21,7 @@ use Doctrine\ORM\QueryBuilder;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use OpenApi\Generator;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -74,7 +78,87 @@ abstract class AbstractApiController extends AbstractFOSRestController
         return $object;
     }
 
-    // TODO ListQueryInterface $listQuery is not a valid interface here. Rethink and fix after batch actions are ready
+    protected function batchProcess(callable $process, BatchQueryInterface $batchQuery, FormInterface $form, ?string $denyKey = null, ?callable $postProcess = null)
+    {
+        $queryBuilder = $this->getBatchQueryBuilder($batchQuery);
+        $objects = $queryBuilder->getQuery()->getResult();
+
+        $results = [];
+
+        foreach ($objects as $object) {
+            if (null !== $denyKey && $this->hasDenyClass()) {
+                $denyClass = $this->getDenyClass();
+                $denyResult = $this->denyManager->deny($denyClass, $denyKey, $object);
+                if (null !== $denyResult) {
+                    $denyResultLabel = $this->denyManager->getDenyObject($denyClass)->getDenyResultLabel($denyResult, $denyKey, $object);
+                    $results[] = new BatchResult($object, BatchResultStatus::SKIPPED, $denyResultLabel);
+                    continue;
+                }
+
+                $this->fillDeny($denyClass, $object);
+            }
+
+            $result = $process($object, $form);
+            if (!$result) {
+                $results[] = $this->getDefaultBatchProcessEmptyResult($object, $form);
+            } else {
+                $results[] = $result;
+            }
+        }
+
+        if (null !== $postProcess) {
+            $postProcess($objects, $form);
+        } else {
+            $this->defaultBatchPostProcess($objects, $form);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Callable $process has following definition:
+     * ($object, FormInterface $form): ?BatchResult.
+     * Empty result from $process will be populated with getDefaultBatchProcessEmptyResult().
+     * By default it will be BatchResult with success status.
+     *
+     * Callable $postProcess has following definition:
+     * (array $objects, FormInterface $form): void.
+     */
+    protected function handleBatchForm(callable $process, Request $request, ?string $denyKey = null, ?callable $postProcess = null, ?string $batchFormClass = null, $batchObject = null, ?array $batchFormOptions = null)
+    {
+        return $this->handleForm($batchFormClass ?? $this->getBatchFormClass(), $request, function (BatchQueryInterface $batchQuery, FormInterface $form) use ($process, $denyKey, $postProcess) {
+            return $this->batchProcess($process, $batchQuery, $form, $denyKey, $postProcess);
+        }, $batchObject, $batchFormOptions ?? $this->getBatchFormOptions());
+    }
+
+    protected function getDefaultBatchProcessEmptyResult($object, FormInterface $form): BatchResult
+    {
+        return new BatchResult($object, BatchResultStatus::SUCCESS);
+    }
+
+    protected function defaultBatchPostProcess(array $objects, FormInterface $form): void
+    {
+        $this->entityManager->flush();
+    }
+
+    protected function getBatchFormOptions(): array
+    {
+        return $this->getDefaultBatchFormOptions();
+    }
+
+    protected function getBatchQueryBuilder(BatchQueryInterface $batchQuery, callable $modifyQueryBuilder = null, string $alias = 'o'): QueryBuilder
+    {
+        $queryBuilder = $this->getQueryBuilder($modifyQueryBuilder, $alias);
+        $queryBuilder->distinct();
+
+        $this->applyListQuerySorting($batchQuery->getSorting(), $queryBuilder, $alias);
+
+        $queryBuilder->andWhere($alias.'.id IN (:ids)');
+        $queryBuilder->setParameter('ids', $batchQuery->getIds());
+
+        return $queryBuilder;
+    }
+
     protected function getListQueryBuilder(ListQueryInterface $listQuery, callable $modifyQueryBuilder = null, string $alias = 'o'): QueryBuilder
     {
         $queryBuilder = $this->getQueryBuilder($modifyQueryBuilder, $alias);
@@ -82,13 +166,6 @@ abstract class AbstractApiController extends AbstractFOSRestController
 
         $this->applyListQuerySorting($listQuery->getSorting(), $queryBuilder, $alias);
         $this->applyListQueryFilters($listQuery->getFilters(), $queryBuilder, $alias);
-
-        // TODO Left for reference to work with selected (batch actions)
-        // if (count($selected) > 0) {
-        //     $this->applySelected($queryBuilder, $alias, $selected);
-        // } else {
-        //     $this->applyFilters($queryBuilder, $alias, $filters, $class);
-        // }
 
         $page = $listQuery->getPage() ?? 1;
         $rowsPerPage = $listQuery->getRowsPerPage() ?? 10;
@@ -300,6 +377,16 @@ abstract class AbstractApiController extends AbstractFOSRestController
         return $editFormClass;
     }
 
+    protected function getBatchFormClass(): string
+    {
+        $batchFormClass = $this->getApiResourceAttributeArgument('batchFormClass');
+        if (null === $batchFormClass) {
+            throw new \Exception('Argument "batchFormClass" not defined. Please define it in "Api\Resource" attribute');
+        }
+
+        return $batchFormClass;
+    }
+
     protected function getListFormClass(): string
     {
         $listFormClass = $this->getApiResourceAttributeArgument('listFormClass');
@@ -472,6 +559,13 @@ abstract class AbstractApiController extends AbstractFOSRestController
         }
 
         return $fieldsFieldChoices;
+    }
+
+    protected function getDefaultBatchFormOptions(): array
+    {
+        return [
+            'sorting_field_choices' => $this->getSortingFieldChoices(),
+        ];
     }
 
     protected function getDefaultListFormOptions(): array

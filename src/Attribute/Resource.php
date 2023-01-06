@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Carve\ApiBundle\Attribute;
 
+use Carve\ApiBundle\Form\BatchQueryType;
 use Carve\ApiBundle\Form\ExportCsvQueryType;
 use Carve\ApiBundle\Form\ExportExcelQueryType;
 use Carve\ApiBundle\Form\ListQueryType;
@@ -25,6 +26,7 @@ class Resource extends OAA\Tag
     public $listFormSortingFieldAppend = Generator::UNDEFINED;
     public $listFormFilterByGroups = Generator::UNDEFINED;
     public $listFormFilterByAppend = Generator::UNDEFINED;
+    public $batchFormClass = Generator::UNDEFINED;
     public $exportCsvFormClass = Generator::UNDEFINED;
     public $exportExcelFormClass = Generator::UNDEFINED;
     public $exportFormFieldGroups = Generator::UNDEFINED;
@@ -49,6 +51,7 @@ class Resource extends OAA\Tag
         'listFormSortingFieldAppend' => 'array',
         'listFormFilterByGroups' => 'array',
         'listFormFilterByAppend' => 'array',
+        'batchFormClass' => 'string',
         'exportCsvFormClass' => 'string',
         'exportExcelFormClass' => 'string',
         'exportFormFieldGroups' => 'array',
@@ -66,6 +69,7 @@ class Resource extends OAA\Tag
         ?array $listFormSortingFieldAppend = null,
         ?array $listFormFilterByGroups = null,
         ?array $listFormFilterByAppend = null,
+        ?string $batchFormClass = BatchQueryType::class,
         ?string $exportCsvFormClass = ExportCsvQueryType::class,
         ?string $exportExcelFormClass = ExportExcelQueryType::class,
         ?array $exportFormFieldGroups = null,
@@ -88,6 +92,7 @@ class Resource extends OAA\Tag
             'listFormSortingFieldAppend' => $listFormSortingFieldAppend ?? Generator::UNDEFINED,
             'listFormFilterByGroups' => $listFormFilterByGroups ?? Generator::UNDEFINED,
             'listFormFilterByAppend' => $listFormFilterByAppend ?? Generator::UNDEFINED,
+            'batchFormClass' => $batchFormClass ?? Generator::UNDEFINED,
             'exportCsvFormClass' => $exportCsvFormClass ?? Generator::UNDEFINED,
             'exportExcelFormClass' => $exportExcelFormClass ?? Generator::UNDEFINED,
             'exportFormFieldGroups' => $exportFormFieldGroups ?? Generator::UNDEFINED,

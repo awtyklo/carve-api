@@ -31,14 +31,14 @@ abstract class AbstractObjectDeny implements ObjectDenyInterface
         foreach ($denyKeys as $denyKey) {
             $denyResult = $this->deny($denyKey, $object);
             if (null !== $denyResult) {
-                $deny[$denyKey] = $this->modifyFillDenyResult($denyResult, $denyKey, $object);
+                $deny[$denyKey] = $this->getDenyResultLabel($denyResult, $denyKey, $object);
             }
         }
 
         $object->setDeny($deny);
     }
 
-    protected function modifyFillDenyResult(string $denyResult, string $denyKey, DenyInterface $object): string
+    public function getDenyResultLabel(string $denyResult, string $denyKey, DenyInterface $object): string
     {
         return 'deny.'.$denyResult;
     }

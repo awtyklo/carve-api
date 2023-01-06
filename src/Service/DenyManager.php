@@ -15,6 +15,11 @@ class DenyManager
         $this->locator = $locator;
     }
 
+    public function deny(string $denyClass, string $denyKey, DenyInterface $object): ?string
+    {
+        return $this->getDenyObject($denyClass)->deny($denyKey, $object);
+    }
+
     public function isDenied(string $denyClass, string $denyKey, DenyInterface $object): bool
     {
         return $this->getDenyObject($denyClass)->isDenied($denyKey, $object);
@@ -25,7 +30,7 @@ class DenyManager
         $this->getDenyObject($denyClass)->fillDeny($object);
     }
 
-    protected function getDenyObject(string $denyClass): AbstractApiObjectDeny
+    public function getDenyObject(string $denyClass): AbstractApiObjectDeny
     {
         if (!$this->locator->has($denyClass)) {
             throw new \Exception('Class "'.$denyClass.'" is not available in service locator that include services tagged with "carve_api.object_deny"');
