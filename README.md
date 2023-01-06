@@ -114,6 +114,103 @@ By default forge frontend `ErrorDialog` by using `handleCatch` and `ErrorContext
 `message` (translated) will be used as dialog title, `errors` array will be shown as multiple `Alert`s with error serverity. Text will be translated using `message` as key and `parameters` as translation parameters.
 `ErrorDialog` needs to be added to application layout
 
+## Batch processing
+
+Batch processing is designed to process results that are possible to query via list endpoint.
+
+```php
+    #[Rest\Post('/batch/disable')]
+    // TODO Rest API docs
+    public function batchDisableAction(Request $request)
+    {
+        $process = function (Device $device) {
+            $device->setEnabled(false);
+        };
+
+        return $this->handleBatchForm($process, $request);
+    }
+```
+
+You can customize returned by returning custom `BatchResult` in `$process` function. When nothing is returned a `BatchResult` with `SUCCESS` status will be returned (controller by `getDefaultBatchProcessEmptyResult` function).
+
+```php
+    $this->handleBatchForm($process, $request, DeviceDeny::DISABLE);
+```
+
+```php
+use Carve\ApiBundle\Model\BatchResult;
+use Carve\ApiBundle\Enum\BatchResultStatus;
+
+    $process = function (Device $device) {
+        $device->setEnabled(false);
+
+        // Your logic
+        if (true) {
+            return new BatchResult($device, BatchResultStatus::SKIPPED, 'batch.device.variableDelete.skipped.missing');
+        }
+    };
+```
+
+You can also use `denyKey` to skip any results that should not be processed (`BatchResult` with `SKIPPED` and message based on `denyKey` will be returned).
+
+You can use following pattern to define additional field in `BatchQueryType` form (which has only `sorting` and `ids` fields).
+
+Define form that includes any needed fields and extends `BatchQueryType`. Fields should not be mapped or you will need to update the data model of form (which is also a good solution).
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Form;
+
+use Carve\ApiBundle\Form\BatchQueryType;
+use Carve\ApiBundle\Validator\Constraints\NotBlank;
+use Symfony\Component\Form\FormBuilderInterface;
+
+class BatchVariableDeleteType extends BatchQueryType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        parent::buildForm($builder, $options);
+
+        $builder->add('name', null, ['mapped' => false, 'constraints' => [
+            new NotBlank(),
+        ]]);
+    }
+}
+```
+
+Prepare a custom logic in Controller.
+
+```php
+    #[Rest\Post('/batch/variable/delete')]
+    // TODO Rest API docs
+    public function batchVariableDeleteAction(Request $request)
+    {
+        $process = function (Device $device, FormInterface $form) {
+            $name = $form->get('name')->getData();
+
+            // My custom logic
+        };
+
+        return $this->handleBatchForm($process, $request, DeviceDeny::VARIABLE_DELETE, null, BatchVariableDeleteType::class);
+    }
+```
+
+Notable comment for `handleBatchForm` function.
+
+```php
+/**
+ * Callable $process has following definition:
+ * ($object, FormInterface $form): ?BatchResult.
+ * Empty result from $process will be populated with getDefaultBatchProcessEmptyResult().
+ * By default it will be BatchResult with success status.
+ *
+ * Callable $postProcess has following definition:
+ * (array $objects, FormInterface $form): void.
+ */
+```
 
 ## Export (CSV and Excel)
 
