@@ -3,6 +3,7 @@
 namespace Carve\ApiBundle\EventListener;
 
 use Carve\ApiBundle\Serializer\Normalizer\ExportEnumNormalizer;
+use Carve\ApiBundle\Service\Helper\RoleBasedSerializerGroupsManagerTrait;
 use Carve\ApiBundle\View\ExportCsvView;
 use Carve\ApiBundle\View\ExportExcelView;
 use FOS\RestBundle\Controller\Annotations\View as ViewAnnotation;
@@ -25,6 +26,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class ViewResponseListener implements EventSubscriberInterface
 {
+    use RoleBasedSerializerGroupsManagerTrait;
+
     private $viewHandler;
     private $forceView;
 
@@ -41,7 +44,6 @@ class ViewResponseListener implements EventSubscriberInterface
         if (!$request->attributes->get(FOSRestBundle::ZONE_ATTRIBUTE, true)) {
             return;
         }
-
         $configuration = $request->attributes->get('_template');
 
         $view = $event->getControllerResult();
@@ -64,7 +66,6 @@ class ViewResponseListener implements EventSubscriberInterface
             if (null !== $configuration->getStatusCode() && (null === $view->getStatusCode() || Response::HTTP_OK === $view->getStatusCode())) {
                 $view->setStatusCode($configuration->getStatusCode());
             }
-
             $context = $view->getContext();
             if ($configuration->getSerializerGroups()) {
                 if (null === $context->getGroups()) {
@@ -73,6 +74,9 @@ class ViewResponseListener implements EventSubscriberInterface
                     $context->setGroups(array_merge($context->getGroups(), $configuration->getSerializerGroups()));
                 }
             }
+
+            $context->setGroups(array_unique(array_merge($context->getGroups(), $this->getRoleBasedSerializerGroupsByOwner($configuration->getOwner()))));
+
             if (true === $configuration->getSerializerEnableMaxDepthChecks()) {
                 $context->enableMaxDepth();
             } elseif (false === $configuration->getSerializerEnableMaxDepthChecks()) {
@@ -88,6 +92,7 @@ class ViewResponseListener implements EventSubscriberInterface
             // Force json format when handling export view
             $view->setFormat('json');
             // Extend groups with a custom 'special:export' group when handling export view
+            // TODO does $context variable exist if if ($configuration instanceof ViewAnnotation) { is false???
             $context->setGroups(array_merge($context->getGroups(), [ExportEnumNormalizer::EXPORT_GROUP]));
         }
 

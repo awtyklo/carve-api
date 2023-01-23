@@ -49,6 +49,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.response }
 
+    Carve\ApiBundle\Service\RoleBasedSerializerGroupsManager:
+        class: Carve\ApiBundle\Service\RoleBasedSerializerGroupsManager
+        arguments:
+            - "@security.helper"
+
     Carve\ApiBundle\Service\DenyManager:
         class: Carve\ApiBundle\Service\DenyManager
         arguments:
