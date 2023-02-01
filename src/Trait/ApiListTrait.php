@@ -26,6 +26,10 @@ trait ApiListTrait
         return null;
     }
 
+    protected function processListObject($object)
+    {
+    }
+
     protected function getListFormOptions(): array
     {
         return $this->getDefaultListFormOptions();
@@ -48,6 +52,7 @@ trait ApiListTrait
             $denyClass = $this->getDenyClass();
             foreach ($results as $result) {
                 $this->fillDeny($denyClass, $result);
+                $this->processListObject($result);
             }
         }
 
