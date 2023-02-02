@@ -37,6 +37,13 @@ abstract class AbstractApiController extends AbstractFOSRestController
     use SerializerExtractorTrait;
     use RoleBasedSerializerGroupsManagerTrait;
 
+    protected function modifyResponseObject(object $object): void
+    {
+        // Method will be used in all actions on returned object
+
+        // Empty method for customization
+    }
+
     protected function modifyQueryBuilder(QueryBuilder $queryBuilder, string $alias): void
     {
         // Empty method for customization
