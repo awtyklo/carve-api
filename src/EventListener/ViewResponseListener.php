@@ -77,6 +77,11 @@ class ViewResponseListener implements EventSubscriberInterface
 
             $context->setGroups(array_unique(array_merge($context->getGroups(), $this->getRoleBasedSerializerGroupsByOwner($configuration->getOwner()))));
 
+            if (null !== $exportView) {
+                // Extend groups with a custom 'special:export' group when handling export view
+                $context->setGroups(array_merge($context->getGroups(), [ExportEnumNormalizer::EXPORT_GROUP]));
+            }
+
             if (true === $configuration->getSerializerEnableMaxDepthChecks()) {
                 $context->enableMaxDepth();
             } elseif (false === $configuration->getSerializerEnableMaxDepthChecks()) {
@@ -91,9 +96,6 @@ class ViewResponseListener implements EventSubscriberInterface
         if (null !== $exportView) {
             // Force json format when handling export view
             $view->setFormat('json');
-            // Extend groups with a custom 'special:export' group when handling export view
-            // TODO does $context variable exist if if ($configuration instanceof ViewAnnotation) { is false???
-            $context->setGroups(array_merge($context->getGroups(), [ExportEnumNormalizer::EXPORT_GROUP]));
         }
 
         $response = $this->viewHandler->handle($view, $request);
