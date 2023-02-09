@@ -75,7 +75,11 @@ class ViewResponseListener implements EventSubscriberInterface
                 }
             }
 
-            $context->setGroups(array_unique(array_merge($context->getGroups(), $this->getRoleBasedSerializerGroupsByOwner($configuration->getOwner()))));
+            if (null === $context->getGroups()) {
+                $context->setGroups(array_unique($this->getRoleBasedSerializerGroupsByOwner($configuration->getOwner())));
+            } else {
+                $context->setGroups(array_unique(array_merge($context->getGroups(), $this->getRoleBasedSerializerGroupsByOwner($configuration->getOwner()))));
+            }
 
             if (null !== $exportView) {
                 // Extend groups with a custom 'special:export' group when handling export view
