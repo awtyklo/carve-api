@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Carve\ApiBundle\Trait;
 
 use Carve\ApiBundle\Attribute as Api;
+use Doctrine\Common\Collections\Collection;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +25,13 @@ trait ApiListTrait
     protected function getListObject()
     {
         return null;
+    }
+
+    protected function modifyResponseListObjects(array|Collection $results)
+    {
+        foreach ($results as $result) {
+            $this->modifyResponseObject($result);
+        }
     }
 
     protected function getListFormOptions(): array
@@ -50,6 +58,7 @@ trait ApiListTrait
                 $this->fillDeny($denyClass, $result);
             }
         }
+        $this->modifyResponseListObjects($results);
 
         return [
             'results' => $results,

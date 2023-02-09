@@ -15,6 +15,7 @@ use Carve\ApiBundle\Model\ListQueryInterface;
 use Carve\ApiBundle\Model\ListQuerySortingInterface;
 use Carve\ApiBundle\Service\Helper\DenyManagerTrait;
 use Carve\ApiBundle\Service\Helper\EntityManagerTrait;
+use Carve\ApiBundle\Service\Helper\RoleBasedSerializerGroupsManagerTrait;
 use Carve\ApiBundle\Service\Helper\SerializerExtractorTrait;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
@@ -34,6 +35,14 @@ abstract class AbstractApiController extends AbstractFOSRestController
     use EntityManagerTrait;
     use DenyManagerTrait;
     use SerializerExtractorTrait;
+    use RoleBasedSerializerGroupsManagerTrait;
+
+    protected function modifyResponseObject(object $object): void
+    {
+        // Method will be used in all actions on returned object
+
+        // Empty method for customization
+    }
 
     protected function modifyQueryBuilder(QueryBuilder $queryBuilder, string $alias): void
     {
@@ -481,6 +490,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
         foreach ($reflectionClass->getAttributes(Rest\View::class) as $attribute) {
             $attributeInstance = $attribute->newInstance();
             $serializerGroups = $attributeInstance->getSerializerGroups();
+            $serializerGroups = array_unique(array_merge($serializerGroups, $this->getRoleBasedSerializerGroups(get_class($this))));
 
             return count($serializerGroups) > 0 ? $serializerGroups : null;
         }
@@ -490,6 +500,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
         foreach ($reflectionParentClass->getAttributes(Rest\View::class) as $attribute) {
             $attributeInstance = $attribute->newInstance();
             $serializerGroups = $attributeInstance->getSerializerGroups();
+            $serializerGroups = array_unique(array_merge($serializerGroups, $this->getRoleBasedSerializerGroups(get_class($this))));
 
             return count($serializerGroups) > 0 ? $serializerGroups : null;
         }

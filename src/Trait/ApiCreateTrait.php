@@ -36,6 +36,8 @@ trait ApiCreateTrait
         $this->entityManager->persist($object);
         $this->entityManager->flush();
 
+        $this->modifyResponseObject($object);
+
         return $object;
     }
 }

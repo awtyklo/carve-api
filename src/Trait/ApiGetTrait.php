@@ -17,6 +17,10 @@ trait ApiGetTrait
     #[Api\Response404]
     public function getAction(int $id)
     {
-        return $this->find($id, AbstractApiObjectDeny::GET);
+        $object = $this->find($id, AbstractApiObjectDeny::GET);
+
+        $this->modifyResponseObject($object);
+
+        return $object;
     }
 }
