@@ -16,6 +16,7 @@
         "greaterThanOrEqual": "This value should be greater than or equal {{ compared_value }}",
         "integer": "This value is not a valid integer",
         "datetime": "This value is not a valid datetime value",
+        "email": "This is not a valid e-mail address",
         "url": "This value is not a valid url",
         "ip": "This value is not a valid IP address",
         "rangeDateTime": "This is not a valid datetime value",
