@@ -97,7 +97,7 @@ class ExportEnumNormalizer implements ContextAwareNormalizerInterface
 
     protected function getExportEnumPrefix(string $class, string $property): string
     {
-        $reflectionProperty = new ReflectionProperty($class, $property);
+        $reflectionProperty = new ReflectionProperty($this->getRealClass($class), $property);
         $attributes = $reflectionProperty->getAttributes(ExportEnumPrefix::class);
 
         foreach ($attributes as $attribute) {

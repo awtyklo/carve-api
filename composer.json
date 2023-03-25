@@ -22,6 +22,8 @@
         "nelmio/api-doc-bundle": "^4.8",
         "friendsofsymfony/rest-bundle": "^3.3",
         "symfony/serializer": "5.4.*",
+        "symfony/translation": "5.4.*",
+        "symfony/security-bundle": "5.4.*",
         "symfony/form": "5.4.*",
         "symfony/property-access": "5.4.*",
         "symfony/validator": "5.4.*",
