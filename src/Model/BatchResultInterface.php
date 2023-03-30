@@ -14,7 +14,5 @@ interface BatchResultInterface
 
     public function getStatus(): ?BatchResultStatus;
 
-    public function getMessage(): ?string;
-
-    public function getMessageVariables(): ?array;
+    public function getMessages(): ?array;
 }

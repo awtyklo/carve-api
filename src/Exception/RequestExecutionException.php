@@ -50,6 +50,11 @@ class RequestExecutionException extends ConflictHttpException
         $this->payload = $payload;
     }
 
+    public function getPayload()
+    {
+        return $this->payload;
+    }
+
     public function clear(): void
     {
         $this->errors = [];

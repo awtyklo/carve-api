@@ -21,15 +21,15 @@ class RequestExecutionExceptionNormalizer implements NormalizerInterface
             return [];
         }
 
-        $messages = $exception->getMessages();
-        foreach ($messages as $key => $message) {
-            $messages[$key]['parameters'] = MessageParameterNormalizer::normalize($message['parameters']);
+        $errors = $exception->getErrors();
+        foreach ($errors as $key => $error) {
+            $errors[$key]['parameters'] = MessageParameterNormalizer::normalize($error['parameters']);
         }
 
         return [
             'code' => $exception->getStatusCode(),
-            'executionSeverity' => $exception->getSeverity(),
-            'messages' => $messages,
+            'severity' => $exception->getSeverity(),
+            'errors' => $errors,
             'payload' => $exception->getPayload(),
         ];
     }

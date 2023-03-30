@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Carve\ApiBundle\Model;
 
+use Carve\ApiBundle\Enum\BatchResultMessageSeverity;
 use Carve\ApiBundle\Enum\BatchResultStatus;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -19,16 +20,35 @@ class BatchResult implements BatchResultInterface
     private ?BatchResultStatus $status = null;
 
     #[Groups(['id', 'identification', 'representation', 'batchResult'])]
-    private ?string $message = null;
+    private ?array $messages = [];
 
-    #[Groups(['id', 'identification', 'representation', 'batchResult'])]
-    private ?array $messageVariables = null;
+    public function addMessage(string $message, ?array $parameters = [], ?BatchResultMessageSeverity $severity = null): void
+    {
+        $this->messages[] = new BatchResultMessage($message, $parameters, $severity);
+    }
 
-    public function __construct($object, BatchResultStatus $status, ?string $message = null, ?array $messageVariables = null)
+    public function addMessageError(string $message, ?array $parameters = []): void
+    {
+        $this->addMessage($message, $parameters, BatchResultMessageSeverity::ERROR);
+    }
+
+    public function addMessageWarning(string $message, ?array $parameters = []): void
+    {
+        $this->addMessage($message, $parameters, BatchResultMessageSeverity::WARNING);
+    }
+
+    public function clearMessages(): void
+    {
+        $this->messages = [];
+    }
+
+    public function __construct($object, BatchResultStatus $status, ?string $message = null, ?array $parameters = [], ?BatchResultMessageSeverity $severity = BatchResultMessageSeverity::ERROR)
     {
         $this->status = $status;
-        $this->message = $message;
-        $this->messageVariables = $messageVariables;
+
+        if ($message) {
+            $this->addMessage($message, $parameters, $severity);
+        }
 
         if (method_exists($object, 'getId')) {
             $this->id = $object->getId();
@@ -69,23 +89,13 @@ class BatchResult implements BatchResultInterface
         $this->status = $status;
     }
 
-    public function getMessage(): ?string
+    public function getMessages(): ?array
     {
-        return $this->message;
+        return $this->messages;
     }
 
-    public function setMessage(?string $message)
+    public function setMessages(?array $messages)
     {
-        $this->message = $message;
-    }
-
-    public function getMessageVariables(): ?array
-    {
-        return $this->messageVariables;
-    }
-
-    public function setMessageVariables(?array $messageVariables)
-    {
-        $this->messageVariables = $messageVariables;
+        $this->messages = $messages;
     }
 }

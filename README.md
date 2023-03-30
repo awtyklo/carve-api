@@ -106,13 +106,13 @@ interface TranslateVariablesInterface {
 interface RequestExecutionExceptionErrorType {
     message: string;
     parameters?: TranslateVariablesInterface;
-    executionSeverity: RequestExecutionSeverity;
+    severity: RequestExecutionSeverity;
 }
 
 interface RequestExecutionExceptionType {
     code: number;
     payload: RequestExecutionExceptionPayload;
-    executionSeverity: RequestExecutionSeverity;
+    severity: RequestExecutionSeverity;
     errors: RequestExecutionExceptionErrorType[];
 }
 ```
