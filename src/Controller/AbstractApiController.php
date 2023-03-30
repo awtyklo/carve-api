@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Carve\ApiBundle\Controller;
 
 use Carve\ApiBundle\Attribute as Api;
+use Carve\ApiBundle\Enum\BatchResultMessageSeverity;
 use Carve\ApiBundle\Enum\BatchResultStatus;
 use Carve\ApiBundle\Enum\ListQueryFilterType;
 use Carve\ApiBundle\Model\BatchQueryInterface;
@@ -100,7 +101,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
                 $denyResult = $this->denyManager->deny($denyClass, $denyKey, $object);
                 if (null !== $denyResult) {
                     $denyResultLabel = $this->denyManager->getDenyObject($denyClass)->getDenyResultLabel($denyResult, $denyKey, $object);
-                    $results[] = new BatchResult($object, BatchResultStatus::SKIPPED, $denyResultLabel);
+                    $results[] = new BatchResult($object, BatchResultStatus::SKIPPED, $denyResultLabel, [], BatchResultMessageSeverity::WARNING);
                     continue;
                 }
 

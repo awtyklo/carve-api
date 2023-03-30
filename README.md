@@ -79,19 +79,75 @@ class Kernel extends BaseKernel implements CompilerPassInterface
 
 ## Request execution error reporting
 
-When action execution in backend encouters error that should passed to user (inform user about error). Throw `RequestExecutionException`.
-The result will be returning 409 HTTP Code as:
+Designed to provide additional information in the response when action in a controller could be executed only partially. Throwing `RequestExecutionException` will result in `409` HTTP code.
 
+Below you can find more information about default HTTP codes and how `RequestExecutionException` with `409` fits in it.
+
+-   `200` - Request has been executed successfully. Additional data can be included in the response (i.e. updated object).
+-   `204` - Request has been executed successfully. No additional is included in the response.
+-   `400` - Request could not be executed due to invalid payload (widely used with forms). Form errors are serialized by `Carve\ApiBundle\Serializer\Normalizer\FormErrorNormalizer`.
+-   `409` - Request has been executed only partially (payload is correct). Additional information is included in the response.
+-   `500` - Unexpected error.
+
+### Response structure
+
+Example structure as follows (TypeScript).
+
+```ts
+type RequestExecutionSeverity = "warning" | "error";
+
+// eslint-disable-next-line
+type RequestExecutionExceptionPayload = any;
+
+interface TranslateVariablesInterface {
+    [index: string]: any;
+}
+
+interface RequestExecutionExceptionErrorType {
+    message: string;
+    parameters?: TranslateVariablesInterface;
+    severity: RequestExecutionSeverity;
+}
+
+interface RequestExecutionExceptionType {
+    code: number;
+    payload: RequestExecutionExceptionPayload;
+    severity: RequestExecutionSeverity;
+    errors: RequestExecutionExceptionErrorType[];
+}
 ```
+
+First level `severity` will take the value of the highest `severity` from the messages.
+
+```json
 {
-    "code":409,
-    "message":"error.requestExecutionFailed",
-    "errors":[
-        {"message":"functionality.error.somethingFailed","parameters":{"userName":"coolUser","areaNo":2}},
-        {"message":"functionality.error.somethingElseFailed","parameters":{"deviceId":123}}
+    "code": 409,
+    "severity": "error",
+    "payload": null,
+    "errors": [
+        {
+            "message": "functionality.error.processingWarning",
+            "parameters": { "userName": "coolUser", "areaNo": 2 },
+            "severity": "warning"
+        },
+        {
+            "message": "functionality.error.somethingFailed",
+            "parameters": { "deviceId": 123 },
+            "severity": "error"
+        }
     ]
 }
 ```
+
+### Severity interpretation
+
+`error` means that at some point in action execution there was an error that prevented executing remaining steps. Good example would be not be able to connect to third party system (i.e. Google services).
+
+`warning` means that at some point in action execution there was an issue that should not happen, but it has been managed and remaining steps has been executed. Good example would be not be removing action of a resource from third party system which resulted in lack of such resource (our application expects that resource exists and tries to remove it, but the resource does not exist in third party system).
+
+## Usage examples
+
+TODO Fix this (right now it has old examples - some of the are correct. Extend with mergeAsX function example)
 
 `error.requestExecutionFailed` - is default message value - it can be changed by setting 3rd parameter in `RequestExecutionException` constructor.
 Constructor message (1st parameter) is added as first object in errors array, others can be added using addError method
@@ -109,6 +165,8 @@ Another example:
 ```
 throw new RequestExecutionException('functionality.error.somethingFailed', ['userName' => 'coolUser', 'areaNo' => 2]);
 ```
+
+### Integration with forge
 
 By default forge frontend `ErrorDialog` by using `handleCatch` and `ErrorContext` will show response in dialog.
 `message` (translated) will be used as dialog title, `errors` array will be shown as multiple `Alert`s with error serverity. Text will be translated using `message` as key and `parameters` as translation parameters.
