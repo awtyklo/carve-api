@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Carve\ApiBundle\Serializer\Normalizer;
 
+use Carve\ApiBundle\Helper\MessageParameterNormalizer;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -37,16 +38,10 @@ class FormErrorNormalizer implements NormalizerInterface
         $form = $errors = [];
 
         foreach ($data->getErrors() as $error) {
-            $errorPayload = [
+            $errors[] = [
                 'message' => $error->getMessage(),
-                'parameters' => [],
+                'parameters' => MessageParameterNormalizer::normalize($error->getMessageParameters()),
             ];
-
-            foreach ($error->getMessageParameters() as $messageParameter => $messageParameterValue) {
-                $errorPayload['parameters'][$this->normalizeMessageParameter($messageParameter)] = $messageParameterValue;
-            }
-
-            $errors[] = $errorPayload;
         }
 
         if ($errors) {
@@ -65,15 +60,5 @@ class FormErrorNormalizer implements NormalizerInterface
         }
 
         return $form;
-    }
-
-    /**
-     * Every message parameter from default constraints (i.e. Symfony\Component\Validator\Constraints\GreaterThan)
-     * are put in double brackets with spaces (to avoid accidental replacement when applying parameters).
-     * We want to remove the double brackets and send them as it is and let parameter replacement be handled as needed by other application.
-     */
-    protected function normalizeMessageParameter($messageParameter)
-    {
-        return str_replace(['{{ ', ' }}'], '', $messageParameter);
     }
 }
