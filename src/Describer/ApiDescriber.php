@@ -286,6 +286,10 @@ class ApiDescriber implements RouteDescriberInterface
                     }
 
                     $sortingFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $sortingSerializerGroups]);
+                    // Remove 'deny' sortingField choices
+                    if (($denyKey = array_search('deny', $sortingFieldChoices)) !== false) {
+                        unset($sortingFieldChoices[$denyKey]);
+                    }
 
                     $sortingFieldAppend = $this->getListFormSortingFieldAppend($reflectionMethod);
                     if (Generator::UNDEFINED !== $sortingFieldAppend) {
@@ -300,6 +304,10 @@ class ApiDescriber implements RouteDescriberInterface
                     }
 
                     $filterByChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $filterBySerializerGroups]);
+                    // Remove 'deny' from filterBy choices
+                    if (($denyKey = array_search('deny', $filterByChoices)) !== false) {
+                        unset($filterByChoices[$denyKey]);
+                    }
 
                     $filterByAppend = $this->getListFormFilterByAppend($reflectionMethod);
                     if (Generator::UNDEFINED !== $filterByAppend) {
