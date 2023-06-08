@@ -92,9 +92,15 @@ class ListQueryFilterType extends AbstractType
         // Field is added here just for Nelmio
         $builder->add('filterValue', null, [
             'documentation' => [
-                'description' => 'Filter value. Depending on filterType it can be boolean, string, number, date, datetime or array',
-                'type' => ['mixed'],
-                'example' => 'string',
+                'description' => 'Filter value. Depending on filterType it can be string (includes dates), number, integer, boolean, or array',
+                'type' => 'string',
+                'example' => [
+                    'John',
+                    12,
+                    '2023-06-13T15:30:11+02:00',
+                    true,
+                    ['John', 'Mike'],
+                ],
             ],
         ]);
 
