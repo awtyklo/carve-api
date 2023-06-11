@@ -18,7 +18,7 @@ use OpenApi\Generator;
 class ParameterPathId extends OA\Parameter
 {
     public function __construct(
-        // Description is moved as first parameter to act as default value
+        // $description is moved as first parameter to act as default value
         ?string $description = null,
         ?string $parameter = null,
         ?string $name = 'id',
