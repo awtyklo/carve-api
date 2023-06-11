@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 trait ApiCreateTrait
 {
     #[Rest\Post('/create')]
-    #[Api\CreateDescription]
+    #[Api\Summary('Create {{ subjectLower }}')]
     #[Api\CreateRequestBody]
     #[Api\CreateResponse200]
     #[Api\Response400]

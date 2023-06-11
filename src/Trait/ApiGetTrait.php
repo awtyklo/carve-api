@@ -11,8 +11,8 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 trait ApiGetTrait
 {
     #[Rest\Get('/{id}', requirements: ['id' => '\d+'])]
+    #[Api\Summary('Get {{ subjectLower }} by ID')]
     #[Api\GetIdParameter]
-    #[Api\GetDescription]
     #[Api\GetResponse200]
     #[Api\Response404]
     public function getAction(int $id)

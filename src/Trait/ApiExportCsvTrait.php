@@ -14,11 +14,9 @@ use Symfony\Component\HttpFoundation\Request;
 trait ApiExportCsvTrait
 {
     #[Rest\Post('/export/csv')]
+    #[Api\Summary('Export {{ subjectPlural }} as CSV')]
     // TODO Documentation
-    // #[Api\ListDescription]
-    // #[Api\ListRequestBody]
-    // #[Api\ListResponse200]
-    // #[Api\Response400]
+    #[Api\Response400]
     public function exportCsvAction(Request $request)
     {
         return $this->handleForm($this->getExportCsvFormClass(), $request, [$this, 'processExportCsv'], $this->getExportCsvObject(), $this->getExportCsvFormOptions());

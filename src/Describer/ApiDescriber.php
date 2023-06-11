@@ -6,6 +6,7 @@ namespace Carve\ApiBundle\Describer;
 
 use Carve\ApiBundle\Attribute as Api;
 use Carve\ApiBundle\Controller\AbstractApiController;
+use Carve\ApiBundle\Helper\MessageParameterNormalizer;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation as NA;
 use Nelmio\ApiDocBundle\OpenApiPhp\Util;
@@ -32,28 +33,37 @@ class ApiDescriber implements RouteDescriberInterface
 
     public function describe(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
+        $this->describeSummary($api, $route, $reflectionMethod);
+
         $this->describeResponse404($api, $route, $reflectionMethod);
 
-        $this->describeCreateDescription($api, $route, $reflectionMethod);
         $this->describeCreateRequestBody($api, $route, $reflectionMethod);
         $this->describeCreateResponse200($api, $route, $reflectionMethod);
 
         $this->describeDeleteIdParameter($api, $route, $reflectionMethod);
-        $this->describeDeleteDescription($api, $route, $reflectionMethod);
         $this->describeDeleteResponse204($api, $route, $reflectionMethod);
 
         $this->describeEditIdParameter($api, $route, $reflectionMethod);
-        $this->describeEditDescription($api, $route, $reflectionMethod);
         $this->describeEditRequestBody($api, $route, $reflectionMethod);
         $this->describeEditResponse200($api, $route, $reflectionMethod);
 
         $this->describeGetIdParameter($api, $route, $reflectionMethod);
-        $this->describeGetDescription($api, $route, $reflectionMethod);
         $this->describeGetResponse200($api, $route, $reflectionMethod);
 
-        $this->describeListDescription($api, $route, $reflectionMethod);
         $this->describeListRequestBody($api, $route, $reflectionMethod);
         $this->describeListResponse200($api, $route, $reflectionMethod);
+    }
+
+    protected function describeSummary(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        $attribute = $this->getAttribute($reflectionMethod, Api\Summary::class);
+        if (!$attribute) {
+            return;
+        }
+
+        foreach ($this->getOperations($api, $route) as $operation) {
+            $operation->summary = $this->applySubjectParameters($reflectionMethod, $attribute->getSummary());
+        }
     }
 
     protected function describeResponse404(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
@@ -69,17 +79,6 @@ class ApiDescriber implements RouteDescriberInterface
             }
 
             $response->description = $this->getSubjectTitle($reflectionMethod).' with specified ID was not found';
-        }
-    }
-
-    protected function describeCreateDescription(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
-    {
-        if (!$this->hasAttribute($reflectionMethod, Api\CreateDescription::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $operation->summary = 'Create '.$this->getSubjectLower($reflectionMethod);
         }
     }
 
@@ -129,17 +128,6 @@ class ApiDescriber implements RouteDescriberInterface
         }
     }
 
-    protected function describeDeleteDescription(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
-    {
-        if (!$this->hasAttribute($reflectionMethod, Api\DeleteDescription::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $operation->summary = 'Delete '.$this->getSubjectLower($reflectionMethod).' by ID';
-        }
-    }
-
     protected function describeDeleteResponse204(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
         if (!$this->hasAttribute($reflectionMethod, Api\DeleteResponse204::class)) {
@@ -165,17 +153,6 @@ class ApiDescriber implements RouteDescriberInterface
         foreach ($this->getOperations($api, $route) as $operation) {
             $oaParameter = $this->findOpenApiParameter($route, $operation);
             $oaParameter->description = 'The ID of '.$this->getSubjectLower($reflectionMethod).' to edit';
-        }
-    }
-
-    protected function describeEditDescription(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
-    {
-        if (!$this->hasAttribute($reflectionMethod, Api\EditDescription::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $operation->summary = 'Edit '.$this->getSubjectLower($reflectionMethod).' by ID';
         }
     }
 
@@ -225,17 +202,6 @@ class ApiDescriber implements RouteDescriberInterface
         }
     }
 
-    protected function describeGetDescription(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
-    {
-        if (!$this->hasAttribute($reflectionMethod, Api\GetDescription::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $operation->summary = 'Get '.$this->getSubjectLower($reflectionMethod).' by ID';
-        }
-    }
-
     protected function describeGetResponse200(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
         if (!$this->hasAttribute($reflectionMethod, Api\GetResponse200::class)) {
@@ -251,17 +217,6 @@ class ApiDescriber implements RouteDescriberInterface
             $response->description = 'Returns '.$this->getSubjectLower($reflectionMethod);
             // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
             $response->_unmerged[] = new NA\Model(type: $this->getClass($reflectionMethod), groups: $this->getSerializerGroups($reflectionMethod));
-        }
-    }
-
-    protected function describeListDescription(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
-    {
-        if (!$this->hasAttribute($reflectionMethod, Api\ListDescription::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $operation->summary = 'List '.$this->getSubjectPlural($reflectionMethod);
         }
     }
 
@@ -389,6 +344,19 @@ class ApiDescriber implements RouteDescriberInterface
         return null;
     }
 
+    protected function applySubjectParameters(\ReflectionMethod $reflectionMethod, string $message): string
+    {
+        if (!$this->hasApiResourceSubject($reflectionMethod)) {
+            return $message;
+        }
+
+        return MessageParameterNormalizer::applyParameters($message, [
+            'subjectTitle' => $this->getSubjectTitle($reflectionMethod),
+            'subjectLower' => $this->getSubjectLower($reflectionMethod),
+            'subjectPlural' => $this->getSubjectPlural($reflectionMethod),
+        ]);
+    }
+
     protected function getSubjectTitle(\ReflectionMethod $reflectionMethod): string
     {
         return (string) u($this->getSubject($reflectionMethod))->title();
@@ -465,6 +433,25 @@ class ApiDescriber implements RouteDescriberInterface
         throw new \Exception('Missing '.$propertyName);
     }
 
+    protected function hasApiResourceProperty(\ReflectionMethod $reflectionMethod, string $propertyName): bool
+    {
+        $reflectionClass = new \ReflectionClass($reflectionMethod->class);
+        foreach ($reflectionClass->getAttributes(Api\Resource::class) as $attribute) {
+            $attributeInstance = $attribute->newInstance();
+
+            if ($attributeInstance->$propertyName) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function hasApiResourceSubject(\ReflectionMethod $reflectionMethod): bool
+    {
+        return $this->hasApiResourceProperty($reflectionMethod, 'subject');
+    }
+
     protected function getSerializerGroups(\ReflectionMethod $reflectionMethod): ?array
     {
         foreach ($reflectionMethod->getAttributes(Rest\View::class) as $attribute) {
@@ -492,6 +479,16 @@ class ApiDescriber implements RouteDescriberInterface
         }
 
         return null;
+    }
+
+    protected function getAttribute(\ReflectionMethod $reflectionMethod, string $attributeClass): ?object
+    {
+        $attributes = $reflectionMethod->getAttributes($attributeClass);
+        if (0 === count($attributes)) {
+            return null;
+        }
+
+        return $attributes[0]->newInstance();
     }
 
     protected function hasAttribute(\ReflectionMethod $reflectionMethod, string $attributeClass): bool

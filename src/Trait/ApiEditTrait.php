@@ -13,8 +13,8 @@ use Symfony\Component\HttpFoundation\Request;
 trait ApiEditTrait
 {
     #[Rest\Post('/{id}', requirements: ['id' => '\d+'])]
+    #[Api\Summary('Edit {{ subjectLower }} by ID')]
     #[Api\EditIdParameter]
-    #[Api\EditDescription]
     #[Api\EditRequestBody]
     #[Api\EditResponse200]
     #[Api\Response400]

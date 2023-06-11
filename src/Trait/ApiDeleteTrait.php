@@ -11,8 +11,8 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 trait ApiDeleteTrait
 {
     #[Rest\Delete('/{id}', requirements: ['id' => '\d+'])]
+    #[Api\Summary('Delete {{ subjectLower }} by ID')]
     #[Api\DeleteIdParameter]
-    #[Api\DeleteDescription]
     #[Api\DeleteResponse204]
     #[Api\Response404]
     public function deleteAction(int $id)
