@@ -344,3 +344,19 @@ It should link local package instead of one from remote.
 **Note!** It will change `composer.json`. Please remember that while committing changes.
 
 TODO: How to revert this
+
+## REST API Documentation
+
+WIP
+
+Resource variables -> optional (when possible)
+
+-   `#[Api\Summary]` -> $operation->summary with resource variables
+-   `#[Api\ParameterPathId(description: '')]` -> Preconfigured Api\Parameter like EditIdParameter with proper description of variable
+-   `#[Api\Parameter(name: 'id', description: '')]` -> Preconfigured OA\Parameter with description with variables
+-   `#[Api\Response200ContentClass(description: '')]` -> Response 200 with description with variables and content set as class from Resource and serialization groups
+-   `#[Api\Response200ContentModel(description: '', modelType: )]` -> Response 200 with description with variables and content set as modelType and serialization groups
+
+Common use cases:
+
+-   `#[OA\RequestBody(content: new Model(type: AuthenticatedChangePasswordType::class))]`
