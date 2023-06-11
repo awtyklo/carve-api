@@ -36,18 +36,17 @@ class ApiDescriber implements RouteDescriberInterface
         $this->describeSummary($api, $route, $reflectionMethod);
         $this->describeParameter($api, $route, $reflectionMethod);
         $this->describeParameterPathId($api, $route, $reflectionMethod);
+        $this->describeResponse200($api, $route, $reflectionMethod);
+        $this->describeResponse200Groups($api, $route, $reflectionMethod);
+        $this->describeResponse200SubjectGroups($api, $route, $reflectionMethod);
 
         $this->describeResponse404($api, $route, $reflectionMethod);
 
         $this->describeCreateRequestBody($api, $route, $reflectionMethod);
-        $this->describeCreateResponse200($api, $route, $reflectionMethod);
 
         $this->describeDeleteResponse204($api, $route, $reflectionMethod);
 
         $this->describeEditRequestBody($api, $route, $reflectionMethod);
-        $this->describeEditResponse200($api, $route, $reflectionMethod);
-
-        $this->describeGetResponse200($api, $route, $reflectionMethod);
 
         $this->describeListRequestBody($api, $route, $reflectionMethod);
         $this->describeListResponse200($api, $route, $reflectionMethod);
@@ -91,6 +90,72 @@ class ApiDescriber implements RouteDescriberInterface
         }
     }
 
+    protected function describeResponse200(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        if (!$this->hasAttribute($reflectionMethod, Api\Response200::class)) {
+            return;
+        }
+
+        foreach ($this->getOperations($api, $route) as $operation) {
+            $response = $this->findResponse($operation, Api\Response200::class);
+            if (!$response) {
+                continue;
+            }
+
+            $response->description = $this->applySubjectParameters($reflectionMethod, $response->description);
+        }
+    }
+
+    protected function describeResponse200Groups(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        if (!$this->hasAttribute($reflectionMethod, Api\Response200Groups::class)) {
+            return;
+        }
+
+        foreach ($this->getOperations($api, $route) as $operation) {
+            $response = $this->findResponse($operation, Api\Response200Groups::class);
+            if (!$response) {
+                continue;
+            }
+
+            $response->description = $this->applySubjectParameters($reflectionMethod, $response->description);
+
+            // We look for Nelmio\ApiDocBundle\Annotation\Model in attachebles and attach groups
+            if (Generator::UNDEFINED !== $response->attachables) {
+                foreach ($response->attachables as $attachable) {
+                    if ($attachable instanceof NA\Model) {
+                        $attachable->groups = $this->getSerializerGroups($reflectionMethod);
+                    }
+                }
+            }
+        }
+    }
+
+    protected function describeResponse200SubjectGroups(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        if (!$this->hasAttribute($reflectionMethod, Api\Response200SubjectGroups::class)) {
+            return;
+        }
+
+        foreach ($this->getOperations($api, $route) as $operation) {
+            $response = $this->findResponse($operation, Api\Response200SubjectGroups::class);
+            if (!$response) {
+                continue;
+            }
+
+            $response->description = $this->applySubjectParameters($reflectionMethod, $response->description);
+
+            $attachable = new NA\Model(type: $this->getClass($reflectionMethod), groups: $this->getSerializerGroups($reflectionMethod));
+
+            // We add Nelmio\ApiDocBundle\Annotation\Model to attachebles
+            if (Generator::UNDEFINED === $response->attachables) {
+                $response->attachables = [$attachable];
+            } else {
+                $response->attachables[] = $attachable;
+            }
+        }
+    }
+
     protected function describeResponse404(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
         if (!$this->hasAttribute($reflectionMethod, Api\Response404::class)) {
@@ -123,24 +188,6 @@ class ApiDescriber implements RouteDescriberInterface
         }
     }
 
-    protected function describeCreateResponse200(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
-    {
-        if (!$this->hasAttribute($reflectionMethod, Api\CreateResponse200::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $response = $this->findResponse($operation, Api\CreateResponse200::class);
-            if (!$response) {
-                continue;
-            }
-
-            $response->description = 'Returns created '.$this->getSubjectLower($reflectionMethod);
-            // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
-            $response->_unmerged[] = new NA\Model(type: $this->getClass($reflectionMethod), groups: $this->getSerializerGroups($reflectionMethod));
-        }
-    }
-
     protected function describeDeleteResponse204(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
         if (!$this->hasAttribute($reflectionMethod, Api\DeleteResponse204::class)) {
@@ -170,42 +217,6 @@ class ApiDescriber implements RouteDescriberInterface
                     $unmerged->ref = new NA\Model(type: $this->getEditFormClass($reflectionMethod));
                 }
             }
-        }
-    }
-
-    protected function describeEditResponse200(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
-    {
-        if (!$this->hasAttribute($reflectionMethod, Api\EditResponse200::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $response = $this->findResponse($operation, Api\EditResponse200::class);
-            if (!$response) {
-                continue;
-            }
-
-            $response->description = 'Returns edited '.$this->getSubjectLower($reflectionMethod);
-            // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
-            $response->_unmerged[] = new NA\Model(type: $this->getClass($reflectionMethod), groups: $this->getSerializerGroups($reflectionMethod));
-        }
-    }
-
-    protected function describeGetResponse200(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
-    {
-        if (!$this->hasAttribute($reflectionMethod, Api\GetResponse200::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $response = $this->findResponse($operation, Api\GetResponse200::class);
-            if (!$response) {
-                continue;
-            }
-
-            $response->description = 'Returns '.$this->getSubjectLower($reflectionMethod);
-            // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
-            $response->_unmerged[] = new NA\Model(type: $this->getClass($reflectionMethod), groups: $this->getSerializerGroups($reflectionMethod));
         }
     }
 
@@ -429,7 +440,7 @@ class ApiDescriber implements RouteDescriberInterface
             return $attributeInstance->$propertyName;
         }
 
-        throw new \Exception('Missing '.$propertyName);
+        throw new \Exception('Missing property "'.$propertyName.'". Please make sure that "'.$reflectionMethod->class.'" has "Carve\ApiBundle\Attribute\Api\Resource" attribute');
     }
 
     protected function hasApiResourceProperty(\ReflectionMethod $reflectionMethod, string $propertyName): bool

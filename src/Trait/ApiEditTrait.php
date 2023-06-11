@@ -16,7 +16,7 @@ trait ApiEditTrait
     #[Api\Summary('Edit {{ subjectLower }} by ID')]
     #[Api\ParameterPathId('ID of {{ subjectLower }} to edit')]
     #[Api\EditRequestBody]
-    #[Api\EditResponse200]
+    #[Api\Response200SubjectGroups('Returns edited {{ subjectLower }}')]
     #[Api\Response400]
     #[Api\Response404]
     public function editAction(Request $request, int $id)

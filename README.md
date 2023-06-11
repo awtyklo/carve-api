@@ -365,11 +365,13 @@ Supported subject parameters as follows. Example for `subject` = "User".
 -   `#[Api\Summary]` - Attaches summary to the operation. Summary supports subject parameters.
 -   `#[Api\Parameter]` - Parameter with description that supports subject parameters.
 -   `#[Api\ParameterPathId]` - Preconfigured path ID parameter with description that supports subject parameters.
+-   `#[Api\Response200]` - Preconfigured response with code 200 and description that supports subject parameters.
+-   `#[Api\Response200Groups]` - Preconfigured path ID parameter with description that supports subject parameters and attaches serialization groups to content (`Nelmio\ApiDocBundle\Annotation\Model` is expected as content).
+-   `#[Api\Response200SubjectGroups]` - Preconfigured path ID parameter with description that supports subject parameters and sets content as `Nelmio\ApiDocBundle\Annotation\Model` with subject class and serialization groups.
 
 WIP
 
--   `#[Api\Response200ContentClass(description: '')]` -> Response 200 with description with variables and content set as class from Resource and serialization groups
--   `#[Api\Response200ContentModel(description: '', modelType: )]` -> Response 200 with description with variables and content set as modelType and serialization groups
+-   `#[Api\Response404]` - Preconfigured response with 404 code and description that supports subject parameters.
 
 Common use cases:
 
@@ -390,4 +392,29 @@ Common use cases:
 ```php
     #[Api\Parameter(name: 'serialNumber', in: 'path', schema: new OA\Schema(type: 'string'), description: 'The serial number of {{ subjectLower }} to return')]
     public function getAction(string $serialNumber)
+```
+
+```php
+    #[Api\Response200(description: 'Returns public configuration for application', content: new NA\Model(type: PublicConfiguration::class))]
+    public function getAction()
+```
+
+```php
+    #[Rest\View(serializerGroups: ['public:configuration'])]
+    #[Api\Response200Groups(description: 'Returns public configuration for application', content: new NA\Model(type: PublicConfiguration::class))]
+    public function getAction()
+```
+
+```php
+#[Rest\View(serializerGroups: ['public:configuration'])]
+class AnonymousController extends AbstractApiController
+{
+    #[Api\Response200Groups(description: 'Returns public configuration for application', content: new NA\Model(type: PublicConfiguration::class))]
+    public function getAction()
+}
+```
+
+```php
+    #[Api\Response200SubjectGroups('Returns created {{ subjectLower }}')]
+    public function createAction(Request $request)
 ```
