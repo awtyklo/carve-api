@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 trait ApiListTrait
 {
     #[Rest\Post('/list')]
-    #[Api\Summary('List {{ subjectPlural }}')]
+    #[Api\Summary('List {{ subjectPluralLower }}')]
     #[Api\ListRequestBody]
     #[Api\ListResponse200]
     #[Api\Response400]

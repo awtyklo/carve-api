@@ -347,13 +347,30 @@ TODO: How to revert this
 
 ## REST API Documentation
 
+### Subject parameters
+
+Some of mentioned attributes support subject parameters which means that a string (i.e. summary, description) can include parameters which will be replaced by `Describer\ApiDescriber`.
+
+Subject parameters are prepared based on `subject` in `Api\Resource` attribute.
+
+Supported subject parameters as follows. Example for `subject` = "User".
+
+-   `subjectLower` i.e. "user"
+-   `subjectTitle` i.e. "User"
+-   `subjectPluralLower` i.e. "users"
+-   `subjectPluralTitle` i.e. "Users"
+
+### Attributes
+
+-   `#[Api\Summary]` - Attaches summary to the operation. Summary supports subject parameters.
+
 WIP
 
 Resource variables -> optional (when possible)
 
 -   `#[Api\Summary]` -> $operation->summary with resource variables
+-   `#[Api\Parameter(name: 'id', description: '')]` -> Parameter with description with variables
 -   `#[Api\ParameterPathId(description: '')]` -> Preconfigured Api\Parameter like EditIdParameter with proper description of variable
--   `#[Api\Parameter(name: 'id', description: '')]` -> Preconfigured OA\Parameter with description with variables
 -   `#[Api\Response200ContentClass(description: '')]` -> Response 200 with description with variables and content set as class from Resource and serialization groups
 -   `#[Api\Response200ContentModel(description: '', modelType: )]` -> Response 200 with description with variables and content set as modelType and serialization groups
 

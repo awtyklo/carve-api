@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 trait ApiExportExcelTrait
 {
     #[Rest\Post('/export/excel')]
-    #[Api\Summary('Export {{ subjectPlural }} as Excel')]
+    #[Api\Summary('Export {{ subjectPluralLower }} as Excel')]
     // TODO Documentation
     // #[Api\ListRequestBody]
     // #[Api\ListResponse200]

@@ -297,7 +297,7 @@ class ApiDescriber implements RouteDescriberInterface
                 continue;
             }
 
-            $response->description = 'Returns list of '.$this->getSubjectPlural($reflectionMethod);
+            $response->description = 'Returns list of '.$this->getSubjectPluralLower($reflectionMethod);
 
             foreach ($response->content as $content) {
                 if ($content instanceof OA\MediaType) {
@@ -351,9 +351,10 @@ class ApiDescriber implements RouteDescriberInterface
         }
 
         return MessageParameterNormalizer::applyParameters($message, [
-            'subjectTitle' => $this->getSubjectTitle($reflectionMethod),
             'subjectLower' => $this->getSubjectLower($reflectionMethod),
-            'subjectPlural' => $this->getSubjectPlural($reflectionMethod),
+            'subjectTitle' => $this->getSubjectTitle($reflectionMethod),
+            'subjectPluralTitle' => $this->getSubjectPluralTitle($reflectionMethod),
+            'subjectPluralLower' => $this->getSubjectPluralLower($reflectionMethod),
         ]);
     }
 
@@ -367,9 +368,18 @@ class ApiDescriber implements RouteDescriberInterface
         return (string) u($this->getSubject($reflectionMethod))->lower();
     }
 
-    protected function getSubjectPlural(\ReflectionMethod $reflectionMethod): string
+    protected function getSubjectPluralLower(\ReflectionMethod $reflectionMethod): string
     {
-        $subject = $this->getSubject($reflectionMethod);
+        $subject = $this->getSubjectLower($reflectionMethod);
+        $inflector = new EnglishInflector();
+        $plurals = $inflector->pluralize($subject);
+
+        return $plurals[0] ?? $subject;
+    }
+
+    protected function getSubjectPluralTitle(\ReflectionMethod $reflectionMethod): string
+    {
+        $subject = $this->getSubjectTitle($reflectionMethod);
         $inflector = new EnglishInflector();
         $plurals = $inflector->pluralize($subject);
 
