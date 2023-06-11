@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Carve\ApiBundle\Attribute;
 
 /**
- * Attaches summary to the operation. Summary can include variables.
+ * Attaches summary to the operation. Summary supports subject parameters.
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Summary
