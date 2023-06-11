@@ -34,20 +34,19 @@ class ApiDescriber implements RouteDescriberInterface
     public function describe(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
         $this->describeSummary($api, $route, $reflectionMethod);
+        $this->describeParameter($api, $route, $reflectionMethod);
+        $this->describeParameterPathId($api, $route, $reflectionMethod);
 
         $this->describeResponse404($api, $route, $reflectionMethod);
 
         $this->describeCreateRequestBody($api, $route, $reflectionMethod);
         $this->describeCreateResponse200($api, $route, $reflectionMethod);
 
-        $this->describeDeleteIdParameter($api, $route, $reflectionMethod);
         $this->describeDeleteResponse204($api, $route, $reflectionMethod);
 
-        $this->describeEditIdParameter($api, $route, $reflectionMethod);
         $this->describeEditRequestBody($api, $route, $reflectionMethod);
         $this->describeEditResponse200($api, $route, $reflectionMethod);
 
-        $this->describeGetIdParameter($api, $route, $reflectionMethod);
         $this->describeGetResponse200($api, $route, $reflectionMethod);
 
         $this->describeListRequestBody($api, $route, $reflectionMethod);
@@ -63,6 +62,32 @@ class ApiDescriber implements RouteDescriberInterface
 
         foreach ($this->getOperations($api, $route) as $operation) {
             $operation->summary = $this->applySubjectParameters($reflectionMethod, $attribute->getSummary());
+        }
+    }
+
+    protected function describeParameter(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        $attribute = $this->getAttribute($reflectionMethod, Api\Parameter::class);
+        if (!$attribute) {
+            return;
+        }
+
+        foreach ($this->getOperations($api, $route) as $operation) {
+            $oaParameter = $this->findOpenApiParameter($route, $operation);
+            $oaParameter->description = $this->applySubjectParameters($reflectionMethod, $oaParameter->description);
+        }
+    }
+
+    protected function describeParameterPathId(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        $attribute = $this->getAttribute($reflectionMethod, Api\ParameterPathId::class);
+        if (!$attribute) {
+            return;
+        }
+
+        foreach ($this->getOperations($api, $route) as $operation) {
+            $oaParameter = $this->findOpenApiParameter($route, $operation);
+            $oaParameter->description = $this->applySubjectParameters($reflectionMethod, $oaParameter->description);
         }
     }
 
@@ -116,18 +141,6 @@ class ApiDescriber implements RouteDescriberInterface
         }
     }
 
-    protected function describeDeleteIdParameter(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
-    {
-        if (!$this->hasAttribute($reflectionMethod, Api\DeleteIdParameter::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $oaParameter = $this->findOpenApiParameter($route, $operation);
-            $oaParameter->description = 'The ID of '.$this->getSubjectLower($reflectionMethod).' to delete';
-        }
-    }
-
     protected function describeDeleteResponse204(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
         if (!$this->hasAttribute($reflectionMethod, Api\DeleteResponse204::class)) {
@@ -141,18 +154,6 @@ class ApiDescriber implements RouteDescriberInterface
             }
 
             $response->description = $this->getSubjectTitle($reflectionMethod).' successfully deleted';
-        }
-    }
-
-    protected function describeEditIdParameter(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
-    {
-        if (!$this->hasAttribute($reflectionMethod, Api\EditIdParameter::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $oaParameter = $this->findOpenApiParameter($route, $operation);
-            $oaParameter->description = 'The ID of '.$this->getSubjectLower($reflectionMethod).' to edit';
         }
     }
 
@@ -187,18 +188,6 @@ class ApiDescriber implements RouteDescriberInterface
             $response->description = 'Returns edited '.$this->getSubjectLower($reflectionMethod);
             // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
             $response->_unmerged[] = new NA\Model(type: $this->getClass($reflectionMethod), groups: $this->getSerializerGroups($reflectionMethod));
-        }
-    }
-
-    protected function describeGetIdParameter(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
-    {
-        if (!$this->hasAttribute($reflectionMethod, Api\GetIdParameter::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $oaParameter = $this->findOpenApiParameter($route, $operation);
-            $oaParameter->description = 'The ID of '.$this->getSubjectLower($reflectionMethod).' to return';
         }
     }
 

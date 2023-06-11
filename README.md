@@ -363,17 +363,31 @@ Supported subject parameters as follows. Example for `subject` = "User".
 ### Attributes
 
 -   `#[Api\Summary]` - Attaches summary to the operation. Summary supports subject parameters.
+-   `#[Api\Parameter]` - Parameter with description that supports subject parameters.
+-   `#[Api\ParameterPathId]` - Preconfigured path ID parameter with description that supports subject parameters.
 
 WIP
 
-Resource variables -> optional (when possible)
-
--   `#[Api\Summary]` -> $operation->summary with resource variables
--   `#[Api\Parameter(name: 'id', description: '')]` -> Parameter with description with variables
--   `#[Api\ParameterPathId(description: '')]` -> Preconfigured Api\Parameter like EditIdParameter with proper description of variable
 -   `#[Api\Response200ContentClass(description: '')]` -> Response 200 with description with variables and content set as class from Resource and serialization groups
 -   `#[Api\Response200ContentModel(description: '', modelType: )]` -> Response 200 with description with variables and content set as modelType and serialization groups
 
 Common use cases:
 
 -   `#[OA\RequestBody(content: new Model(type: AuthenticatedChangePasswordType::class))]`
+
+### Usage examples
+
+```php
+    #[Api\Summary('Get {{ subjectLower }} by ID')]
+    public function getAction(int $id)
+```
+
+```php
+    #[Api\ParameterPathId('ID of {{ subjectLower }} to return')]
+    public function getAction(int $id)
+```
+
+```php
+    #[Api\Parameter(name: 'serialNumber', in: 'path', schema: new OA\Schema(type: 'string'), description: 'The serial number of {{ subjectLower }} to return')]
+    public function getAction(string $serialNumber)
+```

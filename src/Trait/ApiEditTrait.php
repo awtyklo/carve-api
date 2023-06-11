@@ -14,7 +14,7 @@ trait ApiEditTrait
 {
     #[Rest\Post('/{id}', requirements: ['id' => '\d+'])]
     #[Api\Summary('Edit {{ subjectLower }} by ID')]
-    #[Api\EditIdParameter]
+    #[Api\ParameterPathId('ID of {{ subjectLower }} to edit')]
     #[Api\EditRequestBody]
     #[Api\EditResponse200]
     #[Api\Response400]
