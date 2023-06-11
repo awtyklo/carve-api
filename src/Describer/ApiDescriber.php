@@ -297,8 +297,9 @@ class ApiDescriber implements RouteDescriberInterface
                 continue;
             }
 
-            $response->description = 'Returns list of '.$this->getSubjectPluralLower($reflectionMethod);
+            $response->description = $this->applySubjectParameters($reflectionMethod, $response->description);
 
+            // I do not know how to adjust this to similar idea as Response200, Response200Groups or Response200SubjectGroups
             foreach ($response->content as $content) {
                 if ($content instanceof OA\MediaType) {
                     $resultsProperty = Util::getProperty($content->schema, 'results');

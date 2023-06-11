@@ -10,9 +10,10 @@ use OpenApi\Attributes as OA;
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class ListResponse200 extends OA\Response
 {
-    public function __construct(
-    ) {
-        parent::__construct(response: 200, description: 'Returns list of objects', content: new OA\MediaType(
+    public function __construct(string $description)
+    {
+        // I do not know how to adjust this to similar idea as Response200, Response200Groups or Response200SubjectGroups
+        parent::__construct(response: 200, description: $description, content: new OA\MediaType(
             mediaType: 'application/json',
             schema: new OA\Schema(
                 type: 'object',
