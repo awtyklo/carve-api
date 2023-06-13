@@ -371,7 +371,7 @@ Supported subject parameters as follows. Example for `subject` = "User".
 -   `#[Api\Response200]` - Preconfigured response with code 200 and description that supports subject parameters.
 -   `#[Api\Response200Groups]` - Preconfigured response with code 200 and description that supports subject parameters and attaches serialization groups to content (`Nelmio\ApiDocBundle\Annotation\Model` is expected as content).
 -   `#[Api\Response200SubjectGroups]` - Preconfigured response with code 200 and description that supports subject parameters and sets content as `Nelmio\ApiDocBundle\Annotation\Model` with subject class and serialization groups.
--   `#[Api\ListRespose200]` - Preconfigured list response with code 200 and description that supports subject parameters and sets content as object with `rowsCount` and `results` that include items with subject class and serialization groups.
+-   `#[Api\Response200List]` - Preconfigured list response with code 200 and description that supports subject parameters and sets content as object with `rowsCount` and `results` that include items with subject class and serialization groups.
 -   `#[Api\Response204]` - Preconfigured response with code 204 and description that supports subject parameters.
 -   `#[Api\Response204Delete]` - Preconfigured response with code 204 and default description (`{{ subjectTitle }} successfully deleted`) that supports subject parameters.
 -   `#[Api\Response400]` - Preconfigured response with code 400 and default description (`Unable to process request due to invalid data`) that supports subject parameters.
@@ -432,7 +432,7 @@ class AnonymousController extends AbstractApiController
 ```
 
 ```php
-    #[Api\ListResponse200('Returns list of {{ subjectPluralLower }}')]
+    #[Api\Response200List('Returns list of {{ subjectPluralLower }}')]
     public function listAction(Request $request)
 ```
 

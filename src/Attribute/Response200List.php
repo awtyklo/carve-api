@@ -8,7 +8,7 @@ use Nelmio\ApiDocBundle\Annotation as NA;
 use OpenApi\Attributes as OA;
 
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-class ListResponse200 extends OA\Response
+class Response200List extends OA\Response
 {
     public function __construct(string $description)
     {

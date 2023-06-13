@@ -15,7 +15,7 @@ trait ApiListTrait
     #[Rest\Post('/list')]
     #[Api\Summary('List {{ subjectPluralLower }}')]
     #[Api\ListRequestBody]
-    #[Api\ListResponse200('Returns list of {{ subjectPluralLower }}')]
+    #[Api\Response200List('Returns list of {{ subjectPluralLower }}')]
     #[Api\Response400]
     public function listAction(Request $request)
     {

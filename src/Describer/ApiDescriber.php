@@ -50,7 +50,7 @@ class ApiDescriber implements RouteDescriberInterface
         $this->describeRequestBodyEdit($api, $route, $reflectionMethod);
 
         $this->describeListRequestBody($api, $route, $reflectionMethod);
-        $this->describeListResponse200($api, $route, $reflectionMethod);
+        $this->describeResponse200List($api, $route, $reflectionMethod);
     }
 
     protected function describeSummary(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
@@ -305,14 +305,14 @@ class ApiDescriber implements RouteDescriberInterface
         }
     }
 
-    protected function describeListResponse200(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    protected function describeResponse200List(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
-        if (!$this->hasAttribute($reflectionMethod, Api\ListResponse200::class)) {
+        if (!$this->hasAttribute($reflectionMethod, Api\Response200List::class)) {
             return;
         }
 
         foreach ($this->getOperations($api, $route) as $operation) {
-            $response = $this->findResponse($operation, Api\ListResponse200::class);
+            $response = $this->findResponse($operation, Api\Response200List::class);
             if (!$response) {
                 continue;
             }
