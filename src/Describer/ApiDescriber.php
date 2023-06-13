@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace Carve\ApiBundle\Describer;
 
 use Carve\ApiBundle\Attribute as Api;
-use Carve\ApiBundle\Controller\AbstractApiController;
 use Carve\ApiBundle\Helper\MessageParameterNormalizer;
-use FOS\RestBundle\Controller\Annotations as Rest;
+use Carve\ApiBundle\Service\ApiResourceManager;
 use Nelmio\ApiDocBundle\Annotation as NA;
 use Nelmio\ApiDocBundle\OpenApiPhp\Util;
 use Nelmio\ApiDocBundle\RouteDescriber\RouteDescriberInterface;
 use Nelmio\ApiDocBundle\RouteDescriber\RouteDescriberTrait;
 use OpenApi\Annotations as OA;
 use OpenApi\Generator;
-use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\String\Inflector\EnglishInflector;
 
@@ -24,11 +22,11 @@ class ApiDescriber implements RouteDescriberInterface
 {
     use RouteDescriberTrait;
 
-    protected $serializerExtractor;
+    protected ApiResourceManager $apiResourceManager;
 
-    public function __construct(SerializerExtractor $serializerExtractor)
+    public function __construct(ApiResourceManager $apiResourceManager)
     {
-        $this->serializerExtractor = $serializerExtractor;
+        $this->apiResourceManager = $apiResourceManager;
     }
 
     public function describe(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
@@ -133,7 +131,7 @@ class ApiDescriber implements RouteDescriberInterface
     {
         $response = $this->findAndApplyResponseSubjectParameters(Api\Response200Groups::class, $api, $route, $reflectionMethod);
         if (null === $response) {
-            return null;
+            return;
         }
 
         // Find Nelmio\ApiDocBundle\Annotation\Model in attachebles and attach groups
@@ -150,10 +148,15 @@ class ApiDescriber implements RouteDescriberInterface
     {
         $response = $this->findAndApplyResponseSubjectParameters(Api\Response200SubjectGroups::class, $api, $route, $reflectionMethod);
         if (null === $response) {
-            return null;
+            return;
         }
 
-        $attachable = new NA\Model(type: $this->getClass($reflectionMethod), groups: $this->getSerializerGroups($reflectionMethod));
+        $class = $this->apiResourceManager->getAttributeArgument($reflectionMethod, 'class');
+        if (null === $class) {
+            return;
+        }
+
+        $attachable = new NA\Model(type: $class, groups: $this->getSerializerGroups($reflectionMethod));
 
         // Add Nelmio\ApiDocBundle\Annotation\Model to attachebles
         if (Generator::UNDEFINED === $response->attachables) {
@@ -229,10 +232,15 @@ class ApiDescriber implements RouteDescriberInterface
     {
         $requestBody = $this->findAndApplyRequestBodySubjectParameters(Api\RequestBodyCreate::class, $api, $route, $reflectionMethod);
         if (null === $requestBody) {
-            return null;
+            return;
         }
 
-        $attachable = new NA\Model(type: $this->getCreateFormClass($reflectionMethod));
+        $createFormClass = $this->apiResourceManager->getAttributeArgument($reflectionMethod, 'createFormClass');
+        if (null === $createFormClass) {
+            return;
+        }
+
+        $attachable = new NA\Model(type: $createFormClass);
 
         // We add Nelmio\ApiDocBundle\Annotation\Model to attachebles of requestBody
         if (Generator::UNDEFINED === $requestBody->attachables) {
@@ -246,10 +254,15 @@ class ApiDescriber implements RouteDescriberInterface
     {
         $requestBody = $this->findAndApplyRequestBodySubjectParameters(Api\RequestBodyEdit::class, $api, $route, $reflectionMethod);
         if (null === $requestBody) {
-            return null;
+            return;
         }
 
-        $attachable = new NA\Model(type: $this->getEditFormClass($reflectionMethod));
+        $editFormClass = $this->apiResourceManager->getAttributeArgument($reflectionMethod, 'editFormClass');
+        if (null === $editFormClass) {
+            return;
+        }
+
+        $attachable = new NA\Model(type: $editFormClass);
 
         // We add Nelmio\ApiDocBundle\Annotation\Model to attachebles of requestBody
         if (Generator::UNDEFINED === $requestBody->attachables) {
@@ -263,56 +276,20 @@ class ApiDescriber implements RouteDescriberInterface
     {
         $requestBody = $this->findAndApplyRequestBodySubjectParameters(Api\RequestBodyList::class, $api, $route, $reflectionMethod);
         if (null === $requestBody) {
-            return null;
+            return;
         }
 
-        $class = $this->getClass($reflectionMethod);
-        $defaultSerializerGroups = $this->getSerializerGroups($reflectionMethod);
-
-        $sortingSerializerGroups = $this->getListFormSortingFieldGroups($reflectionMethod);
-        if (Generator::UNDEFINED === $sortingSerializerGroups) {
-            if (null !== $defaultSerializerGroups) {
-                $sortingSerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
-            }
+        $listFormClass = $this->apiResourceManager->getAttributeArgument($reflectionMethod, 'listFormClass');
+        if (null === $listFormClass) {
+            return;
         }
 
-        $sortingFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $sortingSerializerGroups]);
-        // Remove 'deny' sortingField choices
-        if (($denyKey = array_search('deny', $sortingFieldChoices)) !== false) {
-            unset($sortingFieldChoices[$denyKey]);
-        }
-
-        $sortingFieldAppend = $this->getListFormSortingFieldAppend($reflectionMethod);
-        if (Generator::UNDEFINED !== $sortingFieldAppend) {
-            $sortingFieldChoices = AbstractApiController::appendFieldChoice($sortingFieldChoices, $sortingFieldAppend);
-        }
-
-        $filterBySerializerGroups = $this->getListFormFilterByGroups($reflectionMethod);
-        if (Generator::UNDEFINED === $filterBySerializerGroups) {
-            if (null !== $defaultSerializerGroups) {
-                $filterBySerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
-            }
-        }
-
-        $filterByChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $filterBySerializerGroups]);
-        // Remove 'deny' from filterBy choices
-        if (($denyKey = array_search('deny', $filterByChoices)) !== false) {
-            unset($filterByChoices[$denyKey]);
-        }
-
-        $filterByAppend = $this->getListFormFilterByAppend($reflectionMethod);
-        if (Generator::UNDEFINED !== $filterByAppend) {
-            $filterByChoices = AbstractApiController::appendFieldChoice($filterByChoices, $filterByAppend);
-        }
-
-        // Reindex
-        $sortingFieldChoices = array_values($sortingFieldChoices);
-        $filterByChoices = array_values($filterByChoices);
+        $sortingFieldChoices = $this->getSortingFieldChoices($reflectionMethod);
+        $filterByChoices = $this->getFilterFilterByChoices($reflectionMethod);
 
         // This value is used only to force generating different schemas for different endpoints for ListQueryType
         $uniqueDocumentationGroup = md5(serialize($sortingFieldChoices).serialize($filterByChoices));
 
-        $listFormClass = $this->getListFormClass($reflectionMethod);
         $attachable = new NA\Model(
             groups: [$uniqueDocumentationGroup],
             type: $listFormClass,
@@ -348,7 +325,13 @@ class ApiDescriber implements RouteDescriberInterface
             foreach ($response->content as $content) {
                 if ($content instanceof OA\MediaType) {
                     $resultsProperty = Util::getProperty($content->schema, 'results');
-                    $resultsProperty->items->ref->type = $this->getClass($reflectionMethod);
+
+                    $class = $this->apiResourceManager->getAttributeArgument($reflectionMethod, 'class');
+                    if (null === $class) {
+                        continue;
+                    }
+
+                    $resultsProperty->items->ref->type = $class;
 
                     $serializerGroups = $this->getSerializerGroups($reflectionMethod);
                     if (null !== $serializerGroups) {
@@ -392,7 +375,7 @@ class ApiDescriber implements RouteDescriberInterface
 
     protected function applySubjectParameters(\ReflectionMethod $reflectionMethod, string $message): string
     {
-        if (!$this->hasApiResourceSubject($reflectionMethod)) {
+        if (!$this->apiResourceManager->hasAttributeArgument($reflectionMethod, 'subject')) {
             return $message;
         }
 
@@ -434,107 +417,7 @@ class ApiDescriber implements RouteDescriberInterface
 
     protected function getSubject(\ReflectionMethod $reflectionMethod): string
     {
-        return $this->getApiResourceProperty($reflectionMethod, 'subject');
-    }
-
-    protected function getClass(\ReflectionMethod $reflectionMethod): string
-    {
-        return $this->getApiResourceProperty($reflectionMethod, 'class');
-    }
-
-    protected function getCreateFormClass(\ReflectionMethod $reflectionMethod): string
-    {
-        return $this->getApiResourceProperty($reflectionMethod, 'createFormClass');
-    }
-
-    protected function getEditFormClass(\ReflectionMethod $reflectionMethod): string
-    {
-        return $this->getApiResourceProperty($reflectionMethod, 'editFormClass');
-    }
-
-    protected function getListFormClass(\ReflectionMethod $reflectionMethod): string
-    {
-        return $this->getApiResourceProperty($reflectionMethod, 'listFormClass');
-    }
-
-    protected function getListFormSortingFieldGroups(\ReflectionMethod $reflectionMethod): string|array
-    {
-        return $this->getApiResourceProperty($reflectionMethod, 'listFormSortingFieldGroups');
-    }
-
-    protected function getListFormSortingFieldAppend(\ReflectionMethod $reflectionMethod): string|array
-    {
-        return $this->getApiResourceProperty($reflectionMethod, 'listFormSortingFieldAppend');
-    }
-
-    protected function getListFormFilterByGroups(\ReflectionMethod $reflectionMethod): string|array
-    {
-        return $this->getApiResourceProperty($reflectionMethod, 'listFormFilterByGroups');
-    }
-
-    protected function getListFormFilterByAppend(\ReflectionMethod $reflectionMethod): string|array
-    {
-        return $this->getApiResourceProperty($reflectionMethod, 'listFormFilterByAppend');
-    }
-
-    protected function getApiResourceProperty(\ReflectionMethod $reflectionMethod, string $propertyName): string|array
-    {
-        $reflectionClass = new \ReflectionClass($reflectionMethod->class);
-        foreach ($reflectionClass->getAttributes(Api\Resource::class) as $attribute) {
-            $attributeInstance = $attribute->newInstance();
-
-            return $attributeInstance->$propertyName;
-        }
-
-        throw new \Exception('Missing property "'.$propertyName.'". Please make sure that "'.$reflectionMethod->class.'" has "Carve\ApiBundle\Attribute\Api\Resource" attribute');
-    }
-
-    protected function hasApiResourceProperty(\ReflectionMethod $reflectionMethod, string $propertyName): bool
-    {
-        $reflectionClass = new \ReflectionClass($reflectionMethod->class);
-        foreach ($reflectionClass->getAttributes(Api\Resource::class) as $attribute) {
-            $attributeInstance = $attribute->newInstance();
-
-            if ($attributeInstance->$propertyName) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    protected function hasApiResourceSubject(\ReflectionMethod $reflectionMethod): bool
-    {
-        return $this->hasApiResourceProperty($reflectionMethod, 'subject');
-    }
-
-    protected function getSerializerGroups(\ReflectionMethod $reflectionMethod): ?array
-    {
-        foreach ($reflectionMethod->getAttributes(Rest\View::class) as $attribute) {
-            $attributeInstance = $attribute->newInstance();
-            $serializerGroups = $attributeInstance->getSerializerGroups();
-
-            return count($serializerGroups) > 0 ? $serializerGroups : null;
-        }
-
-        $reflectionClass = new \ReflectionClass($reflectionMethod->class);
-        foreach ($reflectionClass->getAttributes(Rest\View::class) as $attribute) {
-            $attributeInstance = $attribute->newInstance();
-            $serializerGroups = $attributeInstance->getSerializerGroups();
-
-            return count($serializerGroups) > 0 ? $serializerGroups : null;
-        }
-
-        // Additionally check parent class
-        $reflectionParentClass = $reflectionClass->getParentClass();
-        foreach ($reflectionParentClass->getAttributes(Rest\View::class) as $attribute) {
-            $attributeInstance = $attribute->newInstance();
-            $serializerGroups = $attributeInstance->getSerializerGroups();
-
-            return count($serializerGroups) > 0 ? $serializerGroups : null;
-        }
-
-        return null;
+        return $this->apiResourceManager->getAttributeArgument($reflectionMethod, 'subject');
     }
 
     protected function getAttribute(\ReflectionMethod $reflectionMethod, string $attributeClass): ?object
@@ -550,5 +433,20 @@ class ApiDescriber implements RouteDescriberInterface
     protected function hasAttribute(\ReflectionMethod $reflectionMethod, string $attributeClass): bool
     {
         return count($reflectionMethod->getAttributes($attributeClass)) > 0;
+    }
+
+    protected function getSerializerGroups(\ReflectionMethod $reflectionMethod): ?array
+    {
+        return $this->apiResourceManager->getSerializerGroups($reflectionMethod);
+    }
+
+    protected function getSortingFieldChoices(\ReflectionMethod $reflectionMethod): array
+    {
+        return $this->apiResourceManager->getSortingFieldChoices($reflectionMethod);
+    }
+
+    protected function getFilterFilterByChoices(\ReflectionMethod $reflectionMethod): array
+    {
+        return $this->apiResourceManager->getFilterFilterByChoices($reflectionMethod);
     }
 }

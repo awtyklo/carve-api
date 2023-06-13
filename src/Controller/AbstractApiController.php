@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Carve\ApiBundle\Controller;
 
-use Carve\ApiBundle\Attribute as Api;
 use Carve\ApiBundle\Enum\BatchResultMessageSeverity;
 use Carve\ApiBundle\Enum\BatchResultStatus;
 use Carve\ApiBundle\Enum\ListQueryFilterType;
@@ -14,15 +13,14 @@ use Carve\ApiBundle\Model\ExportQueryInterface;
 use Carve\ApiBundle\Model\ListQueryFilterInterface;
 use Carve\ApiBundle\Model\ListQueryInterface;
 use Carve\ApiBundle\Model\ListQuerySortingInterface;
+use Carve\ApiBundle\Service\Helper\ApiResourceManagerTrait;
 use Carve\ApiBundle\Service\Helper\DenyManagerTrait;
 use Carve\ApiBundle\Service\Helper\EntityManagerTrait;
 use Carve\ApiBundle\Service\Helper\RoleBasedSerializerGroupsManagerTrait;
-use Carve\ApiBundle\Service\Helper\SerializerExtractorTrait;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use OpenApi\Generator;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -35,7 +33,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
 {
     use EntityManagerTrait;
     use DenyManagerTrait;
-    use SerializerExtractorTrait;
+    use ApiResourceManagerTrait;
     use RoleBasedSerializerGroupsManagerTrait;
 
     protected function modifyResponseObject(object $object): void
@@ -364,12 +362,12 @@ abstract class AbstractApiController extends AbstractFOSRestController
 
     protected function getClass(): string
     {
-        return $this->getApiResourceAttributeArgument('class');
+        return $this->getAttributeArgument('class');
     }
 
     protected function getCreateFormClass(): string
     {
-        $createFormClass = $this->getApiResourceAttributeArgument('createFormClass');
+        $createFormClass = $this->getAttributeArgument('createFormClass');
         if (null === $createFormClass) {
             throw new \Exception('Argument "createFormClass" not defined. Please define it in "Api\Resource" attribute');
         }
@@ -379,7 +377,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
 
     protected function getEditFormClass(): string
     {
-        $editFormClass = $this->getApiResourceAttributeArgument('editFormClass');
+        $editFormClass = $this->getAttributeArgument('editFormClass');
         if (null === $editFormClass) {
             throw new \Exception('Argument "editFormClass" not defined. Please define it in "Api\Resource" attribute');
         }
@@ -389,7 +387,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
 
     protected function getBatchFormClass(): string
     {
-        $batchFormClass = $this->getApiResourceAttributeArgument('batchFormClass');
+        $batchFormClass = $this->getAttributeArgument('batchFormClass');
         if (null === $batchFormClass) {
             throw new \Exception('Argument "batchFormClass" not defined. Please define it in "Api\Resource" attribute');
         }
@@ -399,7 +397,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
 
     protected function getListFormClass(): string
     {
-        $listFormClass = $this->getApiResourceAttributeArgument('listFormClass');
+        $listFormClass = $this->getAttributeArgument('listFormClass');
         if (null === $listFormClass) {
             throw new \Exception('Argument "listFormClass" not defined. Please define it in "Api\Resource" attribute');
         }
@@ -409,7 +407,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
 
     protected function getExportCsvFormClass(): string
     {
-        $exportCsvFormClass = $this->getApiResourceAttributeArgument('exportCsvFormClass');
+        $exportCsvFormClass = $this->getAttributeArgument('exportCsvFormClass');
         if (null === $exportCsvFormClass) {
             throw new \Exception('Argument "exportCsvFormClass" not defined. Please define it in "Api\Resource" attribute');
         }
@@ -419,7 +417,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
 
     protected function getExportExcelFormClass(): string
     {
-        $exportExcelFormClass = $this->getApiResourceAttributeArgument('exportExcelFormClass');
+        $exportExcelFormClass = $this->getAttributeArgument('exportExcelFormClass');
         if (null === $exportExcelFormClass) {
             throw new \Exception('Argument "exportExcelFormClass" not defined. Please define it in "Api\Resource" attribute');
         }
@@ -433,42 +431,12 @@ abstract class AbstractApiController extends AbstractFOSRestController
             return false;
         }
 
-        if (Generator::UNDEFINED === $this->getDenyClass()) {
-            return false;
-        }
-
         return true;
     }
 
     protected function getDenyClass(): ?string
     {
-        return $this->getApiResourceAttributeArgument('denyClass');
-    }
-
-    protected function getApiResourceAttributeArgument(string $argument)
-    {
-        $attribute = $this->getApiResourceAttribute();
-        $attributeInstance = $attribute->newInstance();
-
-        if ($attributeInstance->$argument === Generator::UNDEFINED) {
-            return null;
-        }
-
-        return $attributeInstance->$argument;
-    }
-
-    protected function getApiResourceAttribute()
-    {
-        $reflectionClass = new \ReflectionClass($this);
-        $attributes = $reflectionClass->getAttributes();
-
-        foreach ($attributes as $attribute) {
-            if (Api\Resource::class === $attribute->getName()) {
-                return $attribute;
-            }
-        }
-
-        throw new \Exception('Defining "Carve\ApiBundle\Attribute\Resource" attribute is required when extending AbstractApiController');
+        return $this->getAttributeArgument('denyClass');
     }
 
     protected function isManyToManyRelationship(string $field)
@@ -485,92 +453,24 @@ abstract class AbstractApiController extends AbstractFOSRestController
         return false;
     }
 
-    protected function getSerializerGroups(): ?array
+    protected function getAttributeArgument(string $argument): mixed
     {
-        $reflectionClass = new \ReflectionClass($this);
-        foreach ($reflectionClass->getAttributes(Rest\View::class) as $attribute) {
-            $attributeInstance = $attribute->newInstance();
-            $serializerGroups = $attributeInstance->getSerializerGroups();
-            $serializerGroups = array_unique(array_merge($serializerGroups, $this->getRoleBasedSerializerGroups(get_class($this))));
-
-            return count($serializerGroups) > 0 ? $serializerGroups : null;
-        }
-
-        // Additionally check parent class
-        $reflectionParentClass = $reflectionClass->getParentClass();
-        foreach ($reflectionParentClass->getAttributes(Rest\View::class) as $attribute) {
-            $attributeInstance = $attribute->newInstance();
-            $serializerGroups = $attributeInstance->getSerializerGroups();
-            $serializerGroups = array_unique(array_merge($serializerGroups, $this->getRoleBasedSerializerGroups(get_class($this))));
-
-            return count($serializerGroups) > 0 ? $serializerGroups : null;
-        }
-
-        return null;
+        return $this->apiResourceManager->getAttributeArgument(new \ReflectionClass($this), $argument);
     }
 
     protected function getSortingFieldChoices(): array
     {
-        $class = $this->getClass();
-        $defaultSerializerGroups = $this->getSerializerGroups();
-
-        $sortingSerializerGroups = $this->getApiResourceAttributeArgument('listFormSortingFieldGroups');
-        if (null === $sortingSerializerGroups) {
-            if (null !== $defaultSerializerGroups) {
-                $sortingSerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
-            }
-        }
-
-        $sortingFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $sortingSerializerGroups]);
-        $sortingFieldAppend = $this->getApiResourceAttributeArgument('listFormSortingFieldAppend');
-        if (null !== $sortingFieldAppend) {
-            $sortingFieldChoices = AbstractApiController::appendFieldChoice($sortingFieldChoices, $sortingFieldAppend);
-        }
-
-        return $sortingFieldChoices;
+        return $this->apiResourceManager->getSortingFieldChoices(new \ReflectionClass($this));
     }
 
     protected function getFilterFilterByChoices(): array
     {
-        $class = $this->getClass();
-        $defaultSerializerGroups = $this->getSerializerGroups();
-
-        $filterBySerializerGroups = $this->getApiResourceAttributeArgument('listFormFilterByGroups');
-        if (null === $filterBySerializerGroups) {
-            if (null !== $defaultSerializerGroups) {
-                $filterBySerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
-            }
-        }
-
-        $filterByChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $filterBySerializerGroups]);
-        $filterByAppend = $this->getApiResourceAttributeArgument('listFormFilterByAppend');
-        if (null !== $filterByAppend) {
-            $filterByChoices = AbstractApiController::appendFieldChoice($filterByChoices, $filterByAppend);
-        }
-
-        return $filterByChoices;
+        return $this->apiResourceManager->getFilterFilterByChoices(new \ReflectionClass($this));
     }
 
     protected function getFieldsFieldChoices(): array
     {
-        $class = $this->getClass();
-        $defaultSerializerGroups = $this->getSerializerGroups();
-
-        $fieldSerializerGroups = $this->getApiResourceAttributeArgument('exportFormFieldGroups');
-        if (null === $fieldSerializerGroups) {
-            if (null !== $defaultSerializerGroups) {
-                // We do not need to apply normalizeDefaultSerializerGroups here
-                $fieldSerializerGroups = $defaultSerializerGroups;
-            }
-        }
-
-        $fieldsFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $fieldSerializerGroups]);
-        $fieldAppendChoices = $this->getApiResourceAttributeArgument('exportFormFieldAppend');
-        if (null !== $fieldAppendChoices) {
-            $fieldsFieldChoices = AbstractApiController::appendFieldChoice($fieldsFieldChoices, $fieldAppendChoices);
-        }
-
-        return $fieldsFieldChoices;
+        return $this->apiResourceManager->getFieldsFieldChoices(new \ReflectionClass($this));
     }
 
     protected function getDefaultBatchFormOptions(): array
@@ -604,27 +504,5 @@ abstract class AbstractApiController extends AbstractFOSRestController
             'filter_filterBy_choices' => $this->getFilterFilterByChoices(),
             'fields_field_choices' => $this->getFieldsFieldChoices(),
         ];
-    }
-
-    public static function normalizeDefaultSerializerGroups(array $serializerGroups): array
-    {
-        // Replace serializer group 'identification' with 'id', when using default serializer groups
-        $identificationKey = array_search('identification', $serializerGroups);
-        if (false !== $identificationKey) {
-            array_splice($serializerGroups, $identificationKey, 1, ['id']);
-        }
-
-        // Remove serializer group 'representation', when using default serializer groups
-        $representationKey = array_search('representation', $serializerGroups);
-        if (false !== $representationKey) {
-            array_splice($serializerGroups, $representationKey, 1);
-        }
-
-        return $serializerGroups;
-    }
-
-    public static function appendFieldChoice(array $fieldChoices, array $fieldChoicesAppend): array
-    {
-        return array_unique(array_merge($fieldChoices, $fieldChoicesAppend));
     }
 }

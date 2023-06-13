@@ -6,7 +6,7 @@ services:
     carve_api.describer.api_describer:
         class: Carve\ApiBundle\Describer\ApiDescriber
         arguments:
-            - "@property_info.serializer_extractor"
+            - "@Carve\\ApiBundle\\Service\\ApiResourceManager"
         tags: ["nelmio_api_doc.route_describer"]
 
     carve_api.serializer.circular_reference_handler:
@@ -48,6 +48,11 @@ services:
         class: Carve\ApiBundle\EventSubscriber\DebugToolbarReplaceSubscriber
         tags:
             - { name: kernel.event_listener, event: kernel.response }
+
+    Carve\ApiBundle\Service\ApiResourceManager:
+        class: Carve\ApiBundle\Service\ApiResourceManager
+        arguments:
+            - "@property_info"
 
     Carve\ApiBundle\Service\RoleBasedSerializerGroupsManager:
         class: Carve\ApiBundle\Service\RoleBasedSerializerGroupsManager
