@@ -14,7 +14,7 @@ trait ApiDeleteTrait
     #[Api\Summary('Delete {{ subjectLower }} by ID')]
     #[Api\ParameterPathId('ID of {{ subjectLower }} to delete')]
     #[Api\DeleteResponse204]
-    #[Api\Response404]
+    #[Api\Response404Id]
     public function deleteAction(int $id)
     {
         $object = $this->find($id, AbstractApiObjectDeny::DELETE);

@@ -11,14 +11,14 @@ use OpenApi\Attributes\MediaType;
 use OpenApi\Attributes\XmlContent;
 
 /**
- * Preconfigured response with code 404 and description that supports subject parameters.
+ * Preconfigured response with code 404 and default description (`{{ subjectTitle }} with specified ID was not found`) that supports subject parameters.
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-class Response404 extends OA\Response
+class Response404Id extends OA\Response
 {
     public function __construct(
         // $description is moved as first parameter to act as default value
-        ?string $description = null,
+        ?string $description = '{{ subjectTitle }} with specified ID was not found',
         string|object|null $ref = null,
         int|string $response = 404,
         ?array $headers = null,

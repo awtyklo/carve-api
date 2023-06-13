@@ -14,7 +14,7 @@ trait ApiGetTrait
     #[Api\Summary('Get {{ subjectLower }} by ID')]
     #[Api\ParameterPathId('ID of {{ subjectLower }} to return')]
     #[Api\Response200SubjectGroups('Returns {{ subjectLower }}')]
-    #[Api\Response404]
+    #[Api\Response404Id]
     public function getAction(int $id)
     {
         $object = $this->find($id, AbstractApiObjectDeny::GET);

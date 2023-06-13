@@ -41,6 +41,7 @@ class ApiDescriber implements RouteDescriberInterface
         $this->describeResponse200SubjectGroups($api, $route, $reflectionMethod);
 
         $this->describeResponse404($api, $route, $reflectionMethod);
+        $this->describeResponse404Id($api, $route, $reflectionMethod);
 
         $this->describeCreateRequestBody($api, $route, $reflectionMethod);
 
@@ -168,7 +169,23 @@ class ApiDescriber implements RouteDescriberInterface
                 continue;
             }
 
-            $response->description = $this->getSubjectTitle($reflectionMethod).' with specified ID was not found';
+            $response->description = $this->applySubjectParameters($reflectionMethod, $response->description);
+        }
+    }
+
+    protected function describeResponse404Id(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        if (!$this->hasAttribute($reflectionMethod, Api\Response404Id::class)) {
+            return;
+        }
+
+        foreach ($this->getOperations($api, $route) as $operation) {
+            $response = $this->findResponse($operation, Api\Response404Id::class);
+            if (!$response) {
+                continue;
+            }
+
+            $response->description = $this->applySubjectParameters($reflectionMethod, $response->description);
         }
     }
 

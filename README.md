@@ -365,14 +365,14 @@ Supported subject parameters as follows. Example for `subject` = "User".
 -   `#[Api\Summary]` - Attaches summary to the operation. Summary supports subject parameters.
 -   `#[Api\Parameter]` - Parameter with description that supports subject parameters.
 -   `#[Api\ParameterPathId]` - Preconfigured path ID parameter with description that supports subject parameters.
+-   `#[Api\Response404]` - Preconfigured response with code 404 and description that supports subject parameters.
+-   `#[Api\Response404Id]` - Preconfigured response with code 404 and default description (`{{ subjectTitle }} with specified ID was not found`) that supports subject parameters.
 -   `#[Api\Response200]` - Preconfigured response with code 200 and description that supports subject parameters.
 -   `#[Api\Response200Groups]` - Preconfigured response with code 200 and description that supports subject parameters and attaches serialization groups to content (`Nelmio\ApiDocBundle\Annotation\Model` is expected as content).
 -   `#[Api\Response200SubjectGroups]` - Preconfigured response with code 200 and description that supports subject parameters and sets content as `Nelmio\ApiDocBundle\Annotation\Model` with subject class and serialization groups.
 -   `#[Api\ListRespose200]` - Preconfigured list response with code 200 and description that supports subject parameters and sets content as object with `rowsCount` and `results` that include items with subject class and serialization groups.
 
 WIP
-
--   `#[Api\Response404]` - Preconfigured response with 404 code and description that supports subject parameters.
 
 Common use cases:
 

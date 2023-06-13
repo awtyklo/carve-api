@@ -18,7 +18,7 @@ trait ApiEditTrait
     #[Api\EditRequestBody]
     #[Api\Response200SubjectGroups('Returns edited {{ subjectLower }}')]
     #[Api\Response400]
-    #[Api\Response404]
+    #[Api\Response404Id]
     public function editAction(Request $request, int $id)
     {
         $object = $this->find($id, AbstractApiObjectDeny::EDIT);
