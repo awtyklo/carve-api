@@ -49,6 +49,7 @@ class ApiDescriber implements RouteDescriberInterface
         $this->describeRequestBodyEdit($api, $route, $reflectionMethod);
         $this->describeRequestBodyList($api, $route, $reflectionMethod);
         $this->describeRequestBodyExportCsv($api, $route, $reflectionMethod);
+        $this->describeRequestBodyExportExcel($api, $route, $reflectionMethod);
     }
 
     protected function describeSummary(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
@@ -288,7 +289,7 @@ class ApiDescriber implements RouteDescriberInterface
         $sortingFieldChoices = $this->getSortingFieldChoices($reflectionMethod);
         $filterByChoices = $this->getFilterFilterByChoices($reflectionMethod);
 
-        // This value is used only to force generating different schemas for different endpoints for ListQueryType
+        // This value is used only to force generating different schemas for different endpoints for form class
         $uniqueDocumentationGroup = md5(serialize($sortingFieldChoices).serialize($filterByChoices));
 
         $attachable = new NA\Model(
@@ -324,12 +325,49 @@ class ApiDescriber implements RouteDescriberInterface
         $filterByChoices = $this->getFilterFilterByChoices($reflectionMethod);
         $fieldsFieldChoices = $this->getFieldsFieldChoices($reflectionMethod);
 
-        // This value is used only to force generating different schemas for different endpoints for ListQueryType
+        // This value is used only to force generating different schemas for different endpoints for form class
         $uniqueDocumentationGroup = md5(serialize($sortingFieldChoices).serialize($filterByChoices));
 
         $attachable = new NA\Model(
             groups: [$uniqueDocumentationGroup],
             type: $exportCsvFormClass,
+            options: [
+                'sorting_field_choices' => $sortingFieldChoices,
+                'filter_filterBy_choices' => $filterByChoices,
+                'fields_field_choices' => $fieldsFieldChoices,
+            ],
+        );
+
+        // We add Nelmio\ApiDocBundle\Annotation\Model to attachebles of requestBody
+        if (Generator::UNDEFINED === $requestBody->attachables) {
+            $requestBody->attachables = [$attachable];
+        } else {
+            $requestBody->attachables[] = $attachable;
+        }
+    }
+
+    protected function describeRequestBodyExportExcel(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        $requestBody = $this->findAndApplyRequestBodySubjectParameters(Api\RequestBodyExportExcel::class, $api, $route, $reflectionMethod);
+        if (null === $requestBody) {
+            return;
+        }
+
+        $exportExcelFormClass = $this->apiResourceManager->getAttributeArgument($reflectionMethod, 'exportExcelFormClass');
+        if (null === $exportExcelFormClass) {
+            return;
+        }
+
+        $sortingFieldChoices = $this->getSortingFieldChoices($reflectionMethod);
+        $filterByChoices = $this->getFilterFilterByChoices($reflectionMethod);
+        $fieldsFieldChoices = $this->getFieldsFieldChoices($reflectionMethod);
+
+        // This value is used only to force generating different schemas for different endpoints for form class
+        $uniqueDocumentationGroup = md5(serialize($sortingFieldChoices).serialize($filterByChoices));
+
+        $attachable = new NA\Model(
+            groups: [$uniqueDocumentationGroup],
+            type: $exportExcelFormClass,
             options: [
                 'sorting_field_choices' => $sortingFieldChoices,
                 'filter_filterBy_choices' => $filterByChoices,
