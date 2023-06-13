@@ -40,6 +40,7 @@ class ApiDescriber implements RouteDescriberInterface
         $this->describeResponse200Groups($api, $route, $reflectionMethod);
         $this->describeResponse200SubjectGroups($api, $route, $reflectionMethod);
 
+        $this->describeResponse400($api, $route, $reflectionMethod);
         $this->describeResponse404($api, $route, $reflectionMethod);
         $this->describeResponse404Id($api, $route, $reflectionMethod);
 
@@ -154,6 +155,22 @@ class ApiDescriber implements RouteDescriberInterface
             } else {
                 $response->attachables[] = $attachable;
             }
+        }
+    }
+
+    protected function describeResponse400(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        if (!$this->hasAttribute($reflectionMethod, Api\Response400::class)) {
+            return;
+        }
+
+        foreach ($this->getOperations($api, $route) as $operation) {
+            $response = $this->findResponse($operation, Api\Response400::class);
+            if (!$response) {
+                continue;
+            }
+
+            $response->description = $this->applySubjectParameters($reflectionMethod, $response->description);
         }
     }
 
