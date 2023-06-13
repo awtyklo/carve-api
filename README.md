@@ -371,6 +371,7 @@ Supported subject parameters as follows. Example for `subject` = "User".
 -   `#[Api\RequestBodyCreate]` - Request body with content set as Api\Resource->createFormClass and description that supports subject parameters.
 -   `#[Api\RequestBodyEdit]` - Request body with content set as Api\Resource->editFormClass and description that supports subject parameters.
 -   `#[Api\RequestBodyList]` - Request body with content set as Api\Resource->listFormClass (with 'sorting_field_choices and 'filter_filterBy_choices' options) and description that supports subject parameters.
+-   `#[Api\RequestBodyExportCsv]` - Request body with content set as Api\Resource->exportCsvFormClass (with 'sorting_field_choices, 'filter_filterBy_choices' and 'fields_field_choices' options) and description that supports subject parameters.
 -   `#[Api\Response200]` - Preconfigured response with code 200 and description that supports subject parameters.
 -   `#[Api\Response200Groups]` - Preconfigured response with code 200 and description that supports subject parameters and attaches serialization groups to content (`Nelmio\ApiDocBundle\Annotation\Model` is expected as content).
 -   `#[Api\Response200SubjectGroups]` - Preconfigured response with code 200 and description that supports subject parameters and sets content as `Nelmio\ApiDocBundle\Annotation\Model` with subject class and serialization groups.

@@ -15,6 +15,7 @@ trait ApiExportCsvTrait
 {
     #[Rest\Post('/export/csv')]
     #[Api\Summary('Export {{ subjectPluralLower }} as CSV')]
+    #[Api\RequestBodyExportCsv]
     // TODO Documentation
     #[Api\Response400]
     public function exportCsvAction(Request $request)

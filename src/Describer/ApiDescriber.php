@@ -48,6 +48,7 @@ class ApiDescriber implements RouteDescriberInterface
         $this->describeRequestBodyCreate($api, $route, $reflectionMethod);
         $this->describeRequestBodyEdit($api, $route, $reflectionMethod);
         $this->describeRequestBodyList($api, $route, $reflectionMethod);
+        $this->describeRequestBodyExportCsv($api, $route, $reflectionMethod);
     }
 
     protected function describeSummary(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
@@ -307,6 +308,43 @@ class ApiDescriber implements RouteDescriberInterface
         }
     }
 
+    protected function describeRequestBodyExportCsv(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        $requestBody = $this->findAndApplyRequestBodySubjectParameters(Api\RequestBodyExportCsv::class, $api, $route, $reflectionMethod);
+        if (null === $requestBody) {
+            return;
+        }
+
+        $exportCsvFormClass = $this->apiResourceManager->getAttributeArgument($reflectionMethod, 'exportCsvFormClass');
+        if (null === $exportCsvFormClass) {
+            return;
+        }
+
+        $sortingFieldChoices = $this->getSortingFieldChoices($reflectionMethod);
+        $filterByChoices = $this->getFilterFilterByChoices($reflectionMethod);
+        $fieldsFieldChoices = $this->getFieldsFieldChoices($reflectionMethod);
+
+        // This value is used only to force generating different schemas for different endpoints for ListQueryType
+        $uniqueDocumentationGroup = md5(serialize($sortingFieldChoices).serialize($filterByChoices));
+
+        $attachable = new NA\Model(
+            groups: [$uniqueDocumentationGroup],
+            type: $exportCsvFormClass,
+            options: [
+                'sorting_field_choices' => $sortingFieldChoices,
+                'filter_filterBy_choices' => $filterByChoices,
+                'fields_field_choices' => $fieldsFieldChoices,
+            ],
+        );
+
+        // We add Nelmio\ApiDocBundle\Annotation\Model to attachebles of requestBody
+        if (Generator::UNDEFINED === $requestBody->attachables) {
+            $requestBody->attachables = [$attachable];
+        } else {
+            $requestBody->attachables[] = $attachable;
+        }
+    }
+
     protected function describeResponse200List(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
         if (!$this->hasAttribute($reflectionMethod, Api\Response200List::class)) {
@@ -448,5 +486,10 @@ class ApiDescriber implements RouteDescriberInterface
     protected function getFilterFilterByChoices(\ReflectionMethod $reflectionMethod): array
     {
         return $this->apiResourceManager->getFilterFilterByChoices($reflectionMethod);
+    }
+
+    protected function getFieldsFieldChoices(\ReflectionMethod $reflectionMethod): array
+    {
+        return $this->apiResourceManager->getFieldsFieldChoices($reflectionMethod);
     }
 }
