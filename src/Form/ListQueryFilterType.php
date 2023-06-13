@@ -8,6 +8,7 @@ use Carve\ApiBundle\Enum\ListQueryFilterType as ListQueryFilterTypeEnum;
 use Carve\ApiBundle\Form\Type\DateTimeType;
 use Carve\ApiBundle\Model\ListQueryFilter;
 use Carve\ApiBundle\Validator\Constraints as Assert;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -99,5 +100,48 @@ class ListQueryFilterType extends AbstractType
             'data_class' => ListQueryFilter::class,
             'filterBy_choices' => [],
         ]);
+    }
+
+    public static function getDocumentation(array $options): array
+    {
+        return [
+            'type' => 'array',
+            'description' => 'List of filter definitions',
+            'items' => new OA\Schema([
+                'type' => 'object',
+                'required' => [
+                    'filterBy',
+                    'filterType',
+                    'filterValue',
+                ],
+                'properties' => [
+                    new OA\Property([
+                        'type' => 'string',
+                        'property' => 'filterBy',
+                        'enum' => $options,
+                        'description' => 'Field to filter by',
+                    ]),
+                    new OA\Property([
+                        'type' => 'string',
+                        'property' => 'filterType',
+                        'enum' => ListQueryFilterTypeEnum::cases(),
+                        'description' => 'Filter type',
+                        'example' => 'equal',
+                    ]),
+                    new OA\Property([
+                        'type' => 'string',
+                        'property' => 'filterValue',
+                        'description' => 'Filter value. Depending on filterType it can be string (includes dates), number, integer, boolean, or array',
+                        'example' => [
+                            'John',
+                            12,
+                            '2023-06-13T15:30:11+02:00',
+                            true,
+                            ['John', 'Mike'],
+                        ],
+                    ]),
+                ],
+            ]),
+        ];
     }
 }

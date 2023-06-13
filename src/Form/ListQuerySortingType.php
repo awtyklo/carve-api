@@ -6,6 +6,7 @@ namespace Carve\ApiBundle\Form;
 
 use Carve\ApiBundle\Enum\ListQuerySortingDirection;
 use Carve\ApiBundle\Model\ListQuerySorting;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
@@ -33,5 +34,34 @@ class ListQuerySortingType extends AbstractType
             'data_class' => ListQuerySorting::class,
             'field_choices' => [],
         ]);
+    }
+
+    public static function getDocumentation(array $options): array
+    {
+        return [
+            'type' => 'array',
+            'description' => 'List of sorting definitions',
+            'items' => new OA\Schema([
+                'type' => 'object',
+                'required' => [
+                    'field',
+                    'direction',
+                ],
+                'properties' => [
+                    new OA\Property([
+                        'type' => 'string',
+                        'property' => 'field',
+                        'enum' => $options,
+                        'description' => 'Field to sort by',
+                    ]),
+                    new OA\Property([
+                        'type' => 'string',
+                        'property' => 'direction',
+                        'enum' => ListQuerySortingDirection::cases(),
+                        'description' => 'Sorting direction',
+                    ]),
+                ],
+            ]),
+        ];
     }
 }
