@@ -16,19 +16,14 @@ class ListQuerySortingType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // Note: Fields for this form are documented for Nelmio in ListQuerySortingType. Read more there.
         $builder->add('field', ChoiceType::class, [
             'choices' => $options['field_choices'],
             'invalid_message' => 'validation.choice',
-            'documentation' => [
-                'description' => 'Field to sort by',
-            ],
         ]);
         $builder->add('direction', EnumType::class, [
             'class' => ListQuerySortingDirection::class,
             'invalid_message' => 'validation.enum',
-            'documentation' => [
-                'description' => 'Sorting direction',
-            ],
         ]);
     }
 

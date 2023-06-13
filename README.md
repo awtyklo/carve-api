@@ -347,6 +347,8 @@ TODO: How to revert this
 
 ## REST API Documentation
 
+**Note!** Only one method for each endpoint is supported. Multiple methods for endpoint might yield unexpected results (i.e. having both GET and POST on `/api/config`).
+
 ### Subject parameters
 
 Some of mentioned attributes support subject parameters which means that a string (i.e. summary, description) can include parameters which will be replaced by `Describer\ApiDescriber`.
@@ -368,6 +370,7 @@ Supported subject parameters as follows. Example for `subject` = "User".
 -   `#[Api\RequestBody]` - Request body with description that supports subject parameters.
 -   `#[Api\RequestBodyCreate]` - Request body with content set as Api\Resource->createFormClass and description that supports subject parameters.
 -   `#[Api\RequestBodyEdit]` - Request body with content set as Api\Resource->editFormClass and description that supports subject parameters.
+-   `#[Api\RequestBodyList]` - Request body with content set as Api\Resource->listFormClass (with 'sorting_field_choices and 'filter_filterBy_choices' options) and description that supports subject parameters.
 -   `#[Api\Response200]` - Preconfigured response with code 200 and description that supports subject parameters.
 -   `#[Api\Response200Groups]` - Preconfigured response with code 200 and description that supports subject parameters and attaches serialization groups to content (`Nelmio\ApiDocBundle\Annotation\Model` is expected as content).
 -   `#[Api\Response200SubjectGroups]` - Preconfigured response with code 200 and description that supports subject parameters and sets content as `Nelmio\ApiDocBundle\Annotation\Model` with subject class and serialization groups.

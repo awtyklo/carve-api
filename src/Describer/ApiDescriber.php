@@ -40,6 +40,7 @@ class ApiDescriber implements RouteDescriberInterface
         $this->describeResponse200($api, $route, $reflectionMethod);
         $this->describeResponse200Groups($api, $route, $reflectionMethod);
         $this->describeResponse200SubjectGroups($api, $route, $reflectionMethod);
+        $this->describeResponse200List($api, $route, $reflectionMethod);
         $this->describeResponse204($api, $route, $reflectionMethod);
         $this->describeResponse204Delete($api, $route, $reflectionMethod);
         $this->describeResponse400($api, $route, $reflectionMethod);
@@ -48,9 +49,7 @@ class ApiDescriber implements RouteDescriberInterface
 
         $this->describeRequestBodyCreate($api, $route, $reflectionMethod);
         $this->describeRequestBodyEdit($api, $route, $reflectionMethod);
-
-        $this->describeListRequestBody($api, $route, $reflectionMethod);
-        $this->describeResponse200List($api, $route, $reflectionMethod);
+        $this->describeRequestBodyList($api, $route, $reflectionMethod);
     }
 
     protected function describeSummary(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
@@ -189,119 +188,145 @@ class ApiDescriber implements RouteDescriberInterface
         $this->findAndApplyResponseSubjectParameters(Api\Response404Id::class, $api, $route, $reflectionMethod);
     }
 
-    protected function describeRequestBody(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    protected function getRequestBody(string $class, OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod): ?OA\RequestBody
     {
-        if (!$this->hasAttribute($reflectionMethod, Api\RequestBody::class)) {
-            return;
+        if (!$this->hasAttribute($reflectionMethod, $class)) {
+            return null;
         }
 
         foreach ($this->getOperations($api, $route) as $operation) {
-            $operation->requestBody->description = $this->applySubjectParameters($reflectionMethod, $operation->requestBody->description);
+            if ($operation->requestBody) {
+                return $operation->requestBody;
+            }
         }
+
+        return null;
+    }
+
+    protected function applyRequestBodySubjectParameters(OA\RequestBody $requestBody, \ReflectionMethod $reflectionMethod)
+    {
+        $requestBody->description = $this->applySubjectParameters($reflectionMethod, $requestBody->description);
+    }
+
+    protected function findAndApplyRequestBodySubjectParameters(string $class, OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod): ?OA\RequestBody
+    {
+        $requestBody = $this->getRequestBody($class, $api, $route, $reflectionMethod);
+        if (null === $requestBody) {
+            return null;
+        }
+
+        $this->applyRequestBodySubjectParameters($requestBody, $reflectionMethod);
+
+        return $requestBody;
+    }
+
+    protected function describeRequestBody(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        $this->findAndApplyRequestBodySubjectParameters(Api\RequestBody::class, $api, $route, $reflectionMethod);
     }
 
     protected function describeRequestBodyCreate(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
-        if (!$this->hasAttribute($reflectionMethod, Api\RequestBodyCreate::class)) {
-            return;
+        $requestBody = $this->findAndApplyRequestBodySubjectParameters(Api\RequestBodyCreate::class, $api, $route, $reflectionMethod);
+        if (null === $requestBody) {
+            return null;
         }
 
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $attachable = new NA\Model(type: $this->getCreateFormClass($reflectionMethod));
+        $attachable = new NA\Model(type: $this->getCreateFormClass($reflectionMethod));
 
-            $operation->requestBody->description = $this->applySubjectParameters($reflectionMethod, $operation->requestBody->description);
-
-            // We add Nelmio\ApiDocBundle\Annotation\Model to attachebles of requestBody
-            if (Generator::UNDEFINED === $operation->requestBody->attachables) {
-                $operation->requestBody->attachables = [$attachable];
-            } else {
-                $operation->requestBody->attachables[] = $attachable;
-            }
+        // We add Nelmio\ApiDocBundle\Annotation\Model to attachebles of requestBody
+        if (Generator::UNDEFINED === $requestBody->attachables) {
+            $requestBody->attachables = [$attachable];
+        } else {
+            $requestBody->attachables[] = $attachable;
         }
     }
 
     protected function describeRequestBodyEdit(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
-        if (!$this->hasAttribute($reflectionMethod, Api\RequestBodyEdit::class)) {
-            return;
+        $requestBody = $this->findAndApplyRequestBodySubjectParameters(Api\RequestBodyEdit::class, $api, $route, $reflectionMethod);
+        if (null === $requestBody) {
+            return null;
         }
 
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $attachable = new NA\Model(type: $this->getEditFormClass($reflectionMethod));
+        $attachable = new NA\Model(type: $this->getEditFormClass($reflectionMethod));
 
-            $operation->requestBody->description = $this->applySubjectParameters($reflectionMethod, $operation->requestBody->description);
-
-            // We add Nelmio\ApiDocBundle\Annotation\Model to attachebles of requestBody
-            if (Generator::UNDEFINED === $operation->requestBody->attachables) {
-                $operation->requestBody->attachables = [$attachable];
-            } else {
-                $operation->requestBody->attachables[] = $attachable;
-            }
+        // We add Nelmio\ApiDocBundle\Annotation\Model to attachebles of requestBody
+        if (Generator::UNDEFINED === $requestBody->attachables) {
+            $requestBody->attachables = [$attachable];
+        } else {
+            $requestBody->attachables[] = $attachable;
         }
     }
 
-    protected function describeListRequestBody(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    protected function describeRequestBodyList(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
-        if (!$this->hasAttribute($reflectionMethod, Api\ListRequestBody::class)) {
-            return;
+        $requestBody = $this->findAndApplyRequestBodySubjectParameters(Api\RequestBodyList::class, $api, $route, $reflectionMethod);
+        if (null === $requestBody) {
+            return null;
         }
 
-        foreach ($this->getOperations($api, $route) as $operation) {
-            // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
-            foreach ($operation->requestBody->_unmerged as $unmerged) {
-                if ($unmerged instanceof OA\JsonContent) {
-                    $class = $this->getClass($reflectionMethod);
-                    $defaultSerializerGroups = $this->getSerializerGroups($reflectionMethod);
+        $class = $this->getClass($reflectionMethod);
+        $defaultSerializerGroups = $this->getSerializerGroups($reflectionMethod);
 
-                    $sortingSerializerGroups = $this->getListFormSortingFieldGroups($reflectionMethod);
-                    if (Generator::UNDEFINED === $sortingSerializerGroups) {
-                        if (null !== $defaultSerializerGroups) {
-                            $sortingSerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
-                        }
-                    }
-
-                    $sortingFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $sortingSerializerGroups]);
-                    // Remove 'deny' sortingField choices
-                    if (($denyKey = array_search('deny', $sortingFieldChoices)) !== false) {
-                        unset($sortingFieldChoices[$denyKey]);
-                    }
-
-                    $sortingFieldAppend = $this->getListFormSortingFieldAppend($reflectionMethod);
-                    if (Generator::UNDEFINED !== $sortingFieldAppend) {
-                        $sortingFieldChoices = AbstractApiController::appendFieldChoice($sortingFieldChoices, $sortingFieldAppend);
-                    }
-
-                    $filterBySerializerGroups = $this->getListFormFilterByGroups($reflectionMethod);
-                    if (Generator::UNDEFINED === $filterBySerializerGroups) {
-                        if (null !== $defaultSerializerGroups) {
-                            $filterBySerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
-                        }
-                    }
-
-                    $filterByChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $filterBySerializerGroups]);
-                    // Remove 'deny' from filterBy choices
-                    if (($denyKey = array_search('deny', $filterByChoices)) !== false) {
-                        unset($filterByChoices[$denyKey]);
-                    }
-
-                    $filterByAppend = $this->getListFormFilterByAppend($reflectionMethod);
-                    if (Generator::UNDEFINED !== $filterByAppend) {
-                        $filterByChoices = AbstractApiController::appendFieldChoice($filterByChoices, $filterByAppend);
-                    }
-
-                    // This value is used only to force generating different schemas for different endpoints for
-                    // ListQueryType / ListQuerySortingType / ListQueryFilterType
-                    $uniqueDocumentationGroup = md5(serialize($sortingFieldChoices).serialize($filterByChoices));
-
-                    $unmerged->ref = new NA\Model(groups: [$uniqueDocumentationGroup], type: $this->getListFormClass($reflectionMethod), options: [
-                        'sorting_field_choices' => $sortingFieldChoices,
-                        'filter_filterBy_choices' => $filterByChoices,
-                        'documentation' => [
-                            'groups' => [$uniqueDocumentationGroup],
-                        ],
-                    ]);
-                }
+        $sortingSerializerGroups = $this->getListFormSortingFieldGroups($reflectionMethod);
+        if (Generator::UNDEFINED === $sortingSerializerGroups) {
+            if (null !== $defaultSerializerGroups) {
+                $sortingSerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
             }
+        }
+
+        $sortingFieldChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $sortingSerializerGroups]);
+        // Remove 'deny' sortingField choices
+        if (($denyKey = array_search('deny', $sortingFieldChoices)) !== false) {
+            unset($sortingFieldChoices[$denyKey]);
+        }
+
+        $sortingFieldAppend = $this->getListFormSortingFieldAppend($reflectionMethod);
+        if (Generator::UNDEFINED !== $sortingFieldAppend) {
+            $sortingFieldChoices = AbstractApiController::appendFieldChoice($sortingFieldChoices, $sortingFieldAppend);
+        }
+
+        $filterBySerializerGroups = $this->getListFormFilterByGroups($reflectionMethod);
+        if (Generator::UNDEFINED === $filterBySerializerGroups) {
+            if (null !== $defaultSerializerGroups) {
+                $filterBySerializerGroups = AbstractApiController::normalizeDefaultSerializerGroups($defaultSerializerGroups);
+            }
+        }
+
+        $filterByChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $filterBySerializerGroups]);
+        // Remove 'deny' from filterBy choices
+        if (($denyKey = array_search('deny', $filterByChoices)) !== false) {
+            unset($filterByChoices[$denyKey]);
+        }
+
+        $filterByAppend = $this->getListFormFilterByAppend($reflectionMethod);
+        if (Generator::UNDEFINED !== $filterByAppend) {
+            $filterByChoices = AbstractApiController::appendFieldChoice($filterByChoices, $filterByAppend);
+        }
+
+        // Reindex
+        $sortingFieldChoices = array_values($sortingFieldChoices);
+        $filterByChoices = array_values($filterByChoices);
+
+        // This value is used only to force generating different schemas for different endpoints for ListQueryType
+        $uniqueDocumentationGroup = md5(serialize($sortingFieldChoices).serialize($filterByChoices));
+
+        $listFormClass = $this->getListFormClass($reflectionMethod);
+        $attachable = new NA\Model(
+            groups: [$uniqueDocumentationGroup],
+            type: $listFormClass,
+            options: [
+                'sorting_field_choices' => $sortingFieldChoices,
+                'filter_filterBy_choices' => $filterByChoices,
+            ],
+        );
+
+        // We add Nelmio\ApiDocBundle\Annotation\Model to attachebles of requestBody
+        if (Generator::UNDEFINED === $requestBody->attachables) {
+            $requestBody->attachables = [$attachable];
+        } else {
+            $requestBody->attachables[] = $attachable;
         }
     }
 

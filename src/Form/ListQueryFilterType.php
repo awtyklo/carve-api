@@ -24,20 +24,14 @@ class ListQueryFilterType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // Note: Fields for this form are documented for Nelmio in ListQuerySortingType. Read more there.
         $builder->add('filterBy', ChoiceType::class, [
             'choices' => $options['filterBy_choices'],
             'invalid_message' => 'validation.choice',
-            'documentation' => [
-                'description' => 'Field to filter by',
-            ],
         ]);
         $builder->add('filterType', EnumType::class, [
             'class' => ListQueryFilterTypeEnum::class,
             'invalid_message' => 'validation.enum',
-            'documentation' => [
-                'description' => 'Filter type',
-                'example' => 'equal',
-            ],
         ]);
 
         $filterValueFormModifier = function (FormInterface $form, ?ListQueryFilterTypeEnum $filterType = null) {
@@ -88,21 +82,6 @@ class ListQueryFilterType extends AbstractType
                 $filterValueFormModifier($event->getForm()->getParent(), $filterType);
             }
         );
-
-        // Field is added here just for Nelmio
-        $builder->add('filterValue', null, [
-            'documentation' => [
-                'description' => 'Filter value. Depending on filterType it can be string (includes dates), number, integer, boolean, or array',
-                'type' => 'string',
-                'example' => [
-                    'John',
-                    12,
-                    '2023-06-13T15:30:11+02:00',
-                    true,
-                    ['John', 'Mike'],
-                ],
-            ],
-        ]);
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,

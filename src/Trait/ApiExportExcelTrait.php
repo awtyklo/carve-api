@@ -16,7 +16,6 @@ trait ApiExportExcelTrait
     #[Rest\Post('/export/excel')]
     #[Api\Summary('Export {{ subjectPluralLower }} as Excel')]
     // TODO Documentation
-    // #[Api\ListRequestBody]
     // #[Api\Response400]
     public function exportExcelAction(Request $request)
     {
