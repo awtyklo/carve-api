@@ -368,13 +368,15 @@ Supported subject parameters as follows. Example for `subject` = "User".
 -   `#[Api\RequestBody]` - Request body with description that supports subject parameters.
 -   `#[Api\RequestBodyCreate]` - Request body with content set as Api\Resource->createFormClass and description that supports subject parameters.
 -   `#[Api\RequestBodyEdit]` - Request body with content set as Api\Resource->editFormClass and description that supports subject parameters.
--   `#[Api\Response400]` - Preconfigured response with code 400 and default description (`Unable to process request due to invalid data`) that supports subject parameters.
--   `#[Api\Response404]` - Preconfigured response with code 404 and description that supports subject parameters.
--   `#[Api\Response404Id]` - Preconfigured response with code 404 and default description (`{{ subjectTitle }} with specified ID was not found`) that supports subject parameters.
 -   `#[Api\Response200]` - Preconfigured response with code 200 and description that supports subject parameters.
 -   `#[Api\Response200Groups]` - Preconfigured response with code 200 and description that supports subject parameters and attaches serialization groups to content (`Nelmio\ApiDocBundle\Annotation\Model` is expected as content).
 -   `#[Api\Response200SubjectGroups]` - Preconfigured response with code 200 and description that supports subject parameters and sets content as `Nelmio\ApiDocBundle\Annotation\Model` with subject class and serialization groups.
 -   `#[Api\ListRespose200]` - Preconfigured list response with code 200 and description that supports subject parameters and sets content as object with `rowsCount` and `results` that include items with subject class and serialization groups.
+-   `#[Api\Response204]` - Preconfigured response with code 204 and description that supports subject parameters.
+-   `#[Api\Response204Delete]` - Preconfigured response with code 204 and default description (`{{ subjectTitle }} successfully deleted`) that supports subject parameters.
+-   `#[Api\Response400]` - Preconfigured response with code 400 and default description (`Unable to process request due to invalid data`) that supports subject parameters.
+-   `#[Api\Response404]` - Preconfigured response with code 404 and description that supports subject parameters.
+-   `#[Api\Response404Id]` - Preconfigured response with code 404 and default description (`{{ subjectTitle }} with specified ID was not found`) that supports subject parameters.
 
 WIP
 
@@ -405,11 +407,6 @@ Common use cases:
 ```
 
 ```php
-    #[Api\Response404('{{ subjectTitle }} with specified serial number not found')]
-    public function getAction()
-```
-
-```php
     #[Api\Response200(description: 'Returns public configuration for application', content: new NA\Model(type: PublicConfiguration::class))]
     public function getAction()
 ```
@@ -437,4 +434,14 @@ class AnonymousController extends AbstractApiController
 ```php
     #[Api\ListResponse200('Returns list of {{ subjectPluralLower }}')]
     public function listAction(Request $request)
+```
+
+```php
+    #[Api\Response204('{{ subjectTitle }} successfully enabled')]
+    public function enableAction()
+```
+
+```php
+    #[Api\Response404('{{ subjectTitle }} with specified serial number not found')]
+    public function getAction()
 ```

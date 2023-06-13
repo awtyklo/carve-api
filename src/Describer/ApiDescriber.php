@@ -36,18 +36,18 @@ class ApiDescriber implements RouteDescriberInterface
         $this->describeSummary($api, $route, $reflectionMethod);
         $this->describeParameter($api, $route, $reflectionMethod);
         $this->describeParameterPathId($api, $route, $reflectionMethod);
+
         $this->describeResponse200($api, $route, $reflectionMethod);
         $this->describeResponse200Groups($api, $route, $reflectionMethod);
         $this->describeResponse200SubjectGroups($api, $route, $reflectionMethod);
-
+        $this->describeResponse204($api, $route, $reflectionMethod);
+        $this->describeResponse204Delete($api, $route, $reflectionMethod);
         $this->describeResponse400($api, $route, $reflectionMethod);
         $this->describeResponse404($api, $route, $reflectionMethod);
         $this->describeResponse404Id($api, $route, $reflectionMethod);
 
         $this->describeRequestBodyCreate($api, $route, $reflectionMethod);
         $this->describeRequestBodyEdit($api, $route, $reflectionMethod);
-
-        $this->describeDeleteResponse204($api, $route, $reflectionMethod);
 
         $this->describeListRequestBody($api, $route, $reflectionMethod);
         $this->describeListResponse200($api, $route, $reflectionMethod);
@@ -91,42 +91,57 @@ class ApiDescriber implements RouteDescriberInterface
         }
     }
 
-    protected function describeResponse200(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    protected function getResponse(string $class, OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod): ?OA\Response
     {
-        if (!$this->hasAttribute($reflectionMethod, Api\Response200::class)) {
-            return;
+        if (!$this->hasAttribute($reflectionMethod, $class)) {
+            return null;
         }
 
         foreach ($this->getOperations($api, $route) as $operation) {
-            $response = $this->findResponse($operation, Api\Response200::class);
-            if (!$response) {
-                continue;
-            }
+            $response = $this->findResponse($operation, $class);
 
-            $response->description = $this->applySubjectParameters($reflectionMethod, $response->description);
+            if ($response) {
+                return $response;
+            }
         }
+
+        return null;
+    }
+
+    protected function applyResponseSubjectParameters(OA\Response $response, \ReflectionMethod $reflectionMethod)
+    {
+        $response->description = $this->applySubjectParameters($reflectionMethod, $response->description);
+    }
+
+    protected function findAndApplyResponseSubjectParameters(string $class, OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod): ?OA\Response
+    {
+        $response = $this->getResponse($class, $api, $route, $reflectionMethod);
+        if (null === $response) {
+            return null;
+        }
+
+        $this->applyResponseSubjectParameters($response, $reflectionMethod);
+
+        return $response;
+    }
+
+    protected function describeResponse200(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        $this->findAndApplyResponseSubjectParameters(Api\Response200::class, $api, $route, $reflectionMethod);
     }
 
     protected function describeResponse200Groups(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
-        if (!$this->hasAttribute($reflectionMethod, Api\Response200Groups::class)) {
-            return;
+        $response = $this->findAndApplyResponseSubjectParameters(Api\Response200Groups::class, $api, $route, $reflectionMethod);
+        if (null === $response) {
+            return null;
         }
 
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $response = $this->findResponse($operation, Api\Response200Groups::class);
-            if (!$response) {
-                continue;
-            }
-
-            $response->description = $this->applySubjectParameters($reflectionMethod, $response->description);
-
-            // We look for Nelmio\ApiDocBundle\Annotation\Model in attachebles and attach groups
-            if (Generator::UNDEFINED !== $response->attachables) {
-                foreach ($response->attachables as $attachable) {
-                    if ($attachable instanceof NA\Model) {
-                        $attachable->groups = $this->getSerializerGroups($reflectionMethod);
-                    }
+        // Find Nelmio\ApiDocBundle\Annotation\Model in attachebles and attach groups
+        if (Generator::UNDEFINED !== $response->attachables) {
+            foreach ($response->attachables as $attachable) {
+                if ($attachable instanceof NA\Model) {
+                    $attachable->groups = $this->getSerializerGroups($reflectionMethod);
                 }
             }
         }
@@ -134,75 +149,44 @@ class ApiDescriber implements RouteDescriberInterface
 
     protected function describeResponse200SubjectGroups(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
-        if (!$this->hasAttribute($reflectionMethod, Api\Response200SubjectGroups::class)) {
-            return;
+        $response = $this->findAndApplyResponseSubjectParameters(Api\Response200SubjectGroups::class, $api, $route, $reflectionMethod);
+        if (null === $response) {
+            return null;
         }
 
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $response = $this->findResponse($operation, Api\Response200SubjectGroups::class);
-            if (!$response) {
-                continue;
-            }
+        $attachable = new NA\Model(type: $this->getClass($reflectionMethod), groups: $this->getSerializerGroups($reflectionMethod));
 
-            $response->description = $this->applySubjectParameters($reflectionMethod, $response->description);
-
-            $attachable = new NA\Model(type: $this->getClass($reflectionMethod), groups: $this->getSerializerGroups($reflectionMethod));
-
-            // We add Nelmio\ApiDocBundle\Annotation\Model to attachebles
-            if (Generator::UNDEFINED === $response->attachables) {
-                $response->attachables = [$attachable];
-            } else {
-                $response->attachables[] = $attachable;
-            }
+        // Add Nelmio\ApiDocBundle\Annotation\Model to attachebles
+        if (Generator::UNDEFINED === $response->attachables) {
+            $response->attachables = [$attachable];
+        } else {
+            $response->attachables[] = $attachable;
         }
+    }
+
+    protected function describeResponse204(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        $this->findAndApplyResponseSubjectParameters(Api\Response204::class, $api, $route, $reflectionMethod);
+    }
+
+    protected function describeResponse204Delete(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        $this->findAndApplyResponseSubjectParameters(Api\Response204Delete::class, $api, $route, $reflectionMethod);
     }
 
     protected function describeResponse400(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
-        if (!$this->hasAttribute($reflectionMethod, Api\Response400::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $response = $this->findResponse($operation, Api\Response400::class);
-            if (!$response) {
-                continue;
-            }
-
-            $response->description = $this->applySubjectParameters($reflectionMethod, $response->description);
-        }
+        $this->findAndApplyResponseSubjectParameters(Api\Response400::class, $api, $route, $reflectionMethod);
     }
 
     protected function describeResponse404(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
-        if (!$this->hasAttribute($reflectionMethod, Api\Response404::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $response = $this->findResponse($operation, Api\Response404::class);
-            if (!$response) {
-                continue;
-            }
-
-            $response->description = $this->applySubjectParameters($reflectionMethod, $response->description);
-        }
+        $this->findAndApplyResponseSubjectParameters(Api\Response404::class, $api, $route, $reflectionMethod);
     }
 
     protected function describeResponse404Id(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
-        if (!$this->hasAttribute($reflectionMethod, Api\Response404Id::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $response = $this->findResponse($operation, Api\Response404Id::class);
-            if (!$response) {
-                continue;
-            }
-
-            $response->description = $this->applySubjectParameters($reflectionMethod, $response->description);
-        }
+        $this->findAndApplyResponseSubjectParameters(Api\Response404Id::class, $api, $route, $reflectionMethod);
     }
 
     protected function describeRequestBody(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
@@ -253,22 +237,6 @@ class ApiDescriber implements RouteDescriberInterface
             } else {
                 $operation->requestBody->attachables[] = $attachable;
             }
-        }
-    }
-
-    protected function describeDeleteResponse204(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
-    {
-        if (!$this->hasAttribute($reflectionMethod, Api\DeleteResponse204::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            $response = $this->findResponse($operation, Api\DeleteResponse204::class);
-            if (!$response) {
-                continue;
-            }
-
-            $response->description = $this->getSubjectTitle($reflectionMethod).' successfully deleted';
         }
     }
 
