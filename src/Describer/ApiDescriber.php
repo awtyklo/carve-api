@@ -44,11 +44,10 @@ class ApiDescriber implements RouteDescriberInterface
         $this->describeResponse404($api, $route, $reflectionMethod);
         $this->describeResponse404Id($api, $route, $reflectionMethod);
 
-        $this->describeCreateRequestBody($api, $route, $reflectionMethod);
+        $this->describeRequestBodyCreate($api, $route, $reflectionMethod);
+        $this->describeRequestBodyEdit($api, $route, $reflectionMethod);
 
         $this->describeDeleteResponse204($api, $route, $reflectionMethod);
-
-        $this->describeEditRequestBody($api, $route, $reflectionMethod);
 
         $this->describeListRequestBody($api, $route, $reflectionMethod);
         $this->describeListResponse200($api, $route, $reflectionMethod);
@@ -206,18 +205,53 @@ class ApiDescriber implements RouteDescriberInterface
         }
     }
 
-    protected function describeCreateRequestBody(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    protected function describeRequestBody(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
-        if (!$this->hasAttribute($reflectionMethod, Api\CreateRequestBody::class)) {
+        if (!$this->hasAttribute($reflectionMethod, Api\RequestBody::class)) {
             return;
         }
 
         foreach ($this->getOperations($api, $route) as $operation) {
-            // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
-            foreach ($operation->requestBody->_unmerged as $unmerged) {
-                if ($unmerged instanceof OA\JsonContent) {
-                    $unmerged->ref = new NA\Model(type: $this->getCreateFormClass($reflectionMethod));
-                }
+            $operation->requestBody->description = $this->applySubjectParameters($reflectionMethod, $operation->requestBody->description);
+        }
+    }
+
+    protected function describeRequestBodyCreate(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        if (!$this->hasAttribute($reflectionMethod, Api\RequestBodyCreate::class)) {
+            return;
+        }
+
+        foreach ($this->getOperations($api, $route) as $operation) {
+            $attachable = new NA\Model(type: $this->getCreateFormClass($reflectionMethod));
+
+            $operation->requestBody->description = $this->applySubjectParameters($reflectionMethod, $operation->requestBody->description);
+
+            // We add Nelmio\ApiDocBundle\Annotation\Model to attachebles of requestBody
+            if (Generator::UNDEFINED === $operation->requestBody->attachables) {
+                $operation->requestBody->attachables = [$attachable];
+            } else {
+                $operation->requestBody->attachables[] = $attachable;
+            }
+        }
+    }
+
+    protected function describeRequestBodyEdit(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        if (!$this->hasAttribute($reflectionMethod, Api\RequestBodyEdit::class)) {
+            return;
+        }
+
+        foreach ($this->getOperations($api, $route) as $operation) {
+            $attachable = new NA\Model(type: $this->getEditFormClass($reflectionMethod));
+
+            $operation->requestBody->description = $this->applySubjectParameters($reflectionMethod, $operation->requestBody->description);
+
+            // We add Nelmio\ApiDocBundle\Annotation\Model to attachebles of requestBody
+            if (Generator::UNDEFINED === $operation->requestBody->attachables) {
+                $operation->requestBody->attachables = [$attachable];
+            } else {
+                $operation->requestBody->attachables[] = $attachable;
             }
         }
     }
@@ -235,22 +269,6 @@ class ApiDescriber implements RouteDescriberInterface
             }
 
             $response->description = $this->getSubjectTitle($reflectionMethod).' successfully deleted';
-        }
-    }
-
-    protected function describeEditRequestBody(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
-    {
-        if (!$this->hasAttribute($reflectionMethod, Api\EditRequestBody::class)) {
-            return;
-        }
-
-        foreach ($this->getOperations($api, $route) as $operation) {
-            // Unfortunately I do not know why this is in "_unmerged" or how to properly set it up
-            foreach ($operation->requestBody->_unmerged as $unmerged) {
-                if ($unmerged instanceof OA\JsonContent) {
-                    $unmerged->ref = new NA\Model(type: $this->getEditFormClass($reflectionMethod));
-                }
-            }
         }
     }
 

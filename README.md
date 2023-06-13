@@ -365,6 +365,9 @@ Supported subject parameters as follows. Example for `subject` = "User".
 -   `#[Api\Summary]` - Attaches summary to the operation. Summary supports subject parameters.
 -   `#[Api\Parameter]` - Parameter with description that supports subject parameters.
 -   `#[Api\ParameterPathId]` - Preconfigured path ID parameter with description that supports subject parameters.
+-   `#[Api\RequestBody]` - Request body with description that supports subject parameters.
+-   `#[Api\RequestBodyCreate]` - Request body with content set as Api\Resource->createFormClass and description that supports subject parameters.
+-   `#[Api\RequestBodyEdit]` - Request body with content set as Api\Resource->editFormClass and description that supports subject parameters.
 -   `#[Api\Response400]` - Preconfigured response with code 400 and default description (`Unable to process request due to invalid data`) that supports subject parameters.
 -   `#[Api\Response404]` - Preconfigured response with code 404 and description that supports subject parameters.
 -   `#[Api\Response404Id]` - Preconfigured response with code 404 and default description (`{{ subjectTitle }} with specified ID was not found`) that supports subject parameters.
@@ -394,6 +397,11 @@ Common use cases:
 ```php
     #[Api\Parameter(name: 'serialNumber', in: 'path', schema: new OA\Schema(type: 'string'), description: 'The serial number of {{ subjectLower }} to return')]
     public function getAction(string $serialNumber)
+```
+
+```php
+    #[Api\RequestBody(description: 'New data for {{ subjectTitle }}', content: new NA\Model(type: Order::class))]
+    public function editAction()
 ```
 
 ```php

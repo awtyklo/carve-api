@@ -13,7 +13,7 @@ trait ApiCreateTrait
 {
     #[Rest\Post('/create')]
     #[Api\Summary('Create {{ subjectLower }}')]
-    #[Api\CreateRequestBody]
+    #[Api\RequestBodyCreate]
     #[Api\Response200SubjectGroups('Returns created {{ subjectLower }}')]
     #[Api\Response400]
     public function createAction(Request $request)
