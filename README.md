@@ -450,3 +450,38 @@ class AnonymousController extends AbstractApiController
     #[Api\Response404('{{ subjectTitle }} with specified serial number not found')]
     public function getAction()
 ```
+
+### Common use cases
+
+```php
+use Carve\ApiBundle\Attribute as Api;
+use Nelmio\ApiDocBundle\Annotation as NA;
+
+    #[Rest\Post('/change/password')]
+    #[Api\Summary('Change authenticated user password')]
+    #[Api\Response204('Password successfully changed')]
+    #[Api\RequestBody(content: new NA\Model(type: AuthenticatedChangePasswordType::class))]
+    #[Api\Response400]
+    public function changePasswordAction(Request $request)
+```
+
+```php
+use Carve\ApiBundle\Attribute as Api;
+use Nelmio\ApiDocBundle\Annotation as NA;
+
+    #[Rest\Post('/change/password/required')]
+    #[Api\Summary('Change authenticated user password when password change is required. Password change is required when authenticated user roles include ROLE_CHANGEPASSWORDREQUIRED')]
+    #[Api\RequestBody(content: new NA\Model(type: AuthenticationChangePasswordRequiredType::class))]
+    #[Api\Response200(description: 'Returns updated authentication data', content: new NA\Model(type: AuthenticationData::class))]
+    #[Api\Response400]
+```
+
+```php
+use Carve\ApiBundle\Attribute as Api;
+
+    #[Rest\Get('/token/extend/{refreshTokenString}')]
+    #[Api\Summary('Extend refresh token for another access token TTL')]
+    #[Api\Response204('Correct refresh token extended successfully')]
+    #[Api\Parameter(in: 'path', name: 'refreshTokenString', description: 'Refresh token string')]
+    public function extendAction(string $refreshTokenString)
+```
