@@ -368,12 +368,14 @@ Supported subject parameters as follows. Example for `subject` = "User".
 -   `#[Api\Parameter]` - Parameter with description that supports subject parameters.
 -   `#[Api\ParameterPathId]` - Preconfigured path ID parameter with description that supports subject parameters.
 -   `#[Api\RequestBody]` - Request body with description that supports subject parameters.
+-   `#[Api\RequestBodyBatch]` - Request body with attached 'sorting_field_choices' to content options and description that supports subject parameters.
 -   `#[Api\RequestBodyCreate]` - Request body with content set as Api\Resource->createFormClass and description that supports subject parameters.
 -   `#[Api\RequestBodyEdit]` - Request body with content set as Api\Resource->editFormClass and description that supports subject parameters.
--   `#[Api\RequestBodyList]` - Request body with content set as Api\Resource->listFormClass (with 'sorting_field_choices and 'filter_filterBy_choices' options) and description that supports subject parameters.
--   `#[Api\RequestBodyExportCsv]` - Request body with content set as Api\Resource->exportCsvFormClass (with 'sorting_field_choices, 'filter_filterBy_choices' and 'fields_field_choices' options) and description that supports subject parameters.
--   `#[Api\RequestBodyExportExcel]` - Request body with content set as Api\Resource->exportExcelFormClass (with 'sorting_field_choices, 'filter_filterBy_choices' and 'fields_field_choices' options) and description that supports subject parameters.
+-   `#[Api\RequestBodyList]` - Request body with content set as Api\Resource->listFormClass (with 'sorting_field_choices' and 'filter_filterBy_choices' options) and description that supports subject parameters.
+-   `#[Api\RequestBodyExportCsv]` - Request body with content set as Api\Resource->exportCsvFormClass (with 'sorting_field_choices', 'filter_filterBy_choices' and 'fields_field_choices' options) and description that supports subject parameters.
+-   `#[Api\RequestBodyExportExcel]` - Request body with content set as Api\Resource->exportExcelFormClass (with 'sorting_field_choices', 'filter_filterBy_choices' and 'fields_field_choices' options) and description that supports subject parameters.
 -   `#[Api\Response200]` - Preconfigured response with code 200 and description that supports subject parameters.
+-   `#[Api\Response200BatchResults]` - Preconfigured list response with code 200 and description that supports subject parameters and sets content as array of `Carve\ApiBundle\Model\BatchResult`.
 -   `#[Api\Response200Groups]` - Preconfigured response with code 200 and description that supports subject parameters and attaches serialization groups to content (`Nelmio\ApiDocBundle\Annotation\Model` is expected as content).
 -   `#[Api\Response200SubjectGroups]` - Preconfigured response with code 200 and description that supports subject parameters and sets content as `Nelmio\ApiDocBundle\Annotation\Model` with subject class and serialization groups.
 -   `#[Api\Response200List]` - Preconfigured list response with code 200 and description that supports subject parameters and sets content as object with `rowsCount` and `results` that include items with subject class and serialization groups.
@@ -409,6 +411,13 @@ Common use cases:
 ```php
     #[Api\RequestBody(description: 'New data for {{ subjectTitle }}', content: new NA\Model(type: Order::class))]
     public function editAction()
+```
+
+```php
+use Nelmio\ApiDocBundle\Annotation as NA;
+
+    #[Api\RequestBodyBatch(content: new NA\Model(type: BatchVariableAddType::class))]
+    public function batchVariableAddAction()
 ```
 
 ```php
@@ -484,4 +493,16 @@ use Carve\ApiBundle\Attribute as Api;
     #[Api\Response204('Correct refresh token extended successfully')]
     #[Api\Parameter(in: 'path', name: 'refreshTokenString', description: 'Refresh token string')]
     public function extendAction(string $refreshTokenString)
+```
+
+```php
+use Carve\ApiBundle\Attribute as Api;
+use Nelmio\ApiDocBundle\Annotation as NA;
+
+    #[Rest\Post('/batch/variable/add')]
+    #[Api\Summary('Add variable to multiple {{ subjectPluralLower }}')]
+    #[Api\RequestBodyBatch(content: new NA\Model(type: BatchVariableAddType::class))]
+    #[Api\Response200BatchResults]
+    #[Api\Response400]
+    public function batchVariableAddAction(Request $request)
 ```

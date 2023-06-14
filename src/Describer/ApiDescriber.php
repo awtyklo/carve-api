@@ -36,6 +36,7 @@ class ApiDescriber implements RouteDescriberInterface
         $this->describeParameterPathId($api, $route, $reflectionMethod);
 
         $this->describeResponse200($api, $route, $reflectionMethod);
+        $this->describeResponse200BatchResults($api, $route, $reflectionMethod);
         $this->describeResponse200Groups($api, $route, $reflectionMethod);
         $this->describeResponse200SubjectGroups($api, $route, $reflectionMethod);
         $this->describeResponse200List($api, $route, $reflectionMethod);
@@ -45,6 +46,8 @@ class ApiDescriber implements RouteDescriberInterface
         $this->describeResponse404($api, $route, $reflectionMethod);
         $this->describeResponse404Id($api, $route, $reflectionMethod);
 
+        $this->describeRequestBody($api, $route, $reflectionMethod);
+        $this->describeRequestBodyBatch($api, $route, $reflectionMethod);
         $this->describeRequestBodyCreate($api, $route, $reflectionMethod);
         $this->describeRequestBodyEdit($api, $route, $reflectionMethod);
         $this->describeRequestBodyList($api, $route, $reflectionMethod);
@@ -127,6 +130,11 @@ class ApiDescriber implements RouteDescriberInterface
     protected function describeResponse200(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
         $this->findAndApplyResponseSubjectParameters(Api\Response200::class, $api, $route, $reflectionMethod);
+    }
+
+    protected function describeResponse200BatchResults(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        $this->findAndApplyResponseSubjectParameters(Api\Response200BatchResults::class, $api, $route, $reflectionMethod);
     }
 
     protected function describeResponse200Groups(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
@@ -249,6 +257,23 @@ class ApiDescriber implements RouteDescriberInterface
             $requestBody->attachables = [$attachable];
         } else {
             $requestBody->attachables[] = $attachable;
+        }
+    }
+
+    protected function describeRequestBodyBatch(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        $requestBody = $this->findAndApplyRequestBodySubjectParameters(Api\RequestBodyBatch::class, $api, $route, $reflectionMethod);
+        if (null === $requestBody) {
+            return;
+        }
+
+        // Find Nelmio\ApiDocBundle\Annotation\Model in attachebles and attach 'sorting_field_choices'
+        if (Generator::UNDEFINED !== $requestBody->attachables) {
+            foreach ($requestBody->attachables as $attachable) {
+                if ($attachable instanceof NA\Model) {
+                    $attachable->options['sorting_field_choices'] = $this->getSortingFieldChoices($reflectionMethod);
+                }
+            }
         }
     }
 

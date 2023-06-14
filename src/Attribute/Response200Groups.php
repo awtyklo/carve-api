@@ -11,7 +11,7 @@ use OpenApi\Attributes\MediaType;
 use OpenApi\Attributes\XmlContent;
 
 /**
- * Preconfigured path ID parameter with description that supports subject parameters and attaches serialization groups to content.
+ * Preconfigured response with code 200 and description that supports subject parameters and attaches serialization groups to content.
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Response200Groups extends OA\Response

@@ -11,7 +11,7 @@ use OpenApi\Attributes\MediaType;
 use OpenApi\Attributes\XmlContent;
 
 /**
- * Preconfigured path ID parameter with description that supports subject parameters and sets content as `Nelmio\ApiDocBundle\Annotation\Model` with subject class and serialization groups.
+ * Preconfigured response with code 200 and description that supports subject parameters and sets content as `Nelmio\ApiDocBundle\Annotation\Model` with subject class and serialization groups.
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Response200SubjectGroups extends OA\Response

@@ -7,6 +7,9 @@ namespace Carve\ApiBundle\Attribute;
 use Nelmio\ApiDocBundle\Annotation as NA;
 use OpenApi\Attributes as OA;
 
+/**
+ * Preconfigured list response with code 200 and description that supports subject parameters and sets content as object with `rowsCount` and `results` that include items with subject class and serialization groups.
+ */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Response200List extends OA\Response
 {

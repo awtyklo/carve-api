@@ -11,10 +11,10 @@ use OpenApi\Attributes\MediaType;
 use OpenApi\Attributes\XmlContent;
 
 /**
- * Request body with content set as Api\Resource->exportCsvFormClass (with 'sorting_field_choices', 'filter_filterBy_choices' and 'fields_field_choices' options) and description that supports subject parameters.
+ * Request body with attached 'sorting_field_choices' to content options and description that supports subject parameters.
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-class RequestBodyExportCsv extends OA\RequestBody
+class RequestBodyBatch extends OA\RequestBody
 {
     public function __construct(
         // $description is moved as first parameter to act as default value

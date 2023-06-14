@@ -11,7 +11,7 @@ use OpenApi\Attributes\MediaType;
 use OpenApi\Attributes\XmlContent;
 
 /**
- * Request body with content set as Api\Resource->listFormClass (with 'sorting_field_choices and 'filter_filterBy_choices' options) and description that supports subject parameters.
+ * Request body with content set as Api\Resource->listFormClass (with 'sorting_field_choices' and 'filter_filterBy_choices' options) and description that supports subject parameters.
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class RequestBodyList extends OA\RequestBody
