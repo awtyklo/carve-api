@@ -18,7 +18,7 @@ class Response200SubjectGroups extends OA\Response
 {
     public function __construct(
         // $description is moved as first parameter to act as default value
-        ?string $description = null,
+        ?string $description = 'Returns {{ subjectLower }}',
         string|object|null $ref = null,
         int|string $response = 200,
         ?array $headers = null,

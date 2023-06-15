@@ -13,7 +13,7 @@ trait ApiGetTrait
     #[Rest\Get('/{id}', requirements: ['id' => '\d+'])]
     #[Api\Summary('Get {{ subjectLower }} by ID')]
     #[Api\ParameterPathId('ID of {{ subjectLower }} to return')]
-    #[Api\Response200SubjectGroups('Returns {{ subjectLower }}')]
+    #[Api\Response200SubjectGroups]
     #[Api\Response404Id]
     public function getAction(int $id)
     {
