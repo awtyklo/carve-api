@@ -368,7 +368,7 @@ Supported subject parameters as follows. Example for `subject` = "User".
 -   `#[Api\Parameter]` - Parameter with description that supports subject parameters.
 -   `#[Api\ParameterPathId]` - Preconfigured path ID parameter with description that supports subject parameters.
 -   `#[Api\RequestBody]` - Request body with description that supports subject parameters.
--   `#[Api\RequestBodyBatch]` - Request body with attached 'sorting_field_choices' to content options and description that supports subject parameters.
+-   `#[Api\RequestBodyBatch]` - Request body with description that supports subject parameters. When there is no content (`Nelmio\ApiDocBundle\Annotation\Model` is expected) it set as Api\Resource->batchFormClass. It also attaches 'sorting_field_choices' to content options.
 -   `#[Api\RequestBodyCreate]` - Request body with content set as Api\Resource->createFormClass and description that supports subject parameters.
 -   `#[Api\RequestBodyEdit]` - Request body with content set as Api\Resource->editFormClass and description that supports subject parameters.
 -   `#[Api\RequestBodyList]` - Request body with content set as Api\Resource->listFormClass (with 'sorting_field_choices' and 'filter_filterBy_choices' options) and description that supports subject parameters.
@@ -421,17 +421,23 @@ use Nelmio\ApiDocBundle\Annotation as NA;
 ```
 
 ```php
+use Nelmio\ApiDocBundle\Annotation as NA;
+
     #[Api\Response200(description: 'Returns public configuration for application', content: new NA\Model(type: PublicConfiguration::class))]
     public function getAction()
 ```
 
 ```php
+use Nelmio\ApiDocBundle\Annotation as NA;
+
     #[Rest\View(serializerGroups: ['public:configuration'])]
     #[Api\Response200Groups(description: 'Returns public configuration for application', content: new NA\Model(type: PublicConfiguration::class))]
     public function getAction()
 ```
 
 ```php
+use Nelmio\ApiDocBundle\Annotation as NA;
+
 #[Rest\View(serializerGroups: ['public:configuration'])]
 class AnonymousController extends AbstractApiController
 {
@@ -505,4 +511,20 @@ use Nelmio\ApiDocBundle\Annotation as NA;
     #[Api\Response200BatchResults]
     #[Api\Response400]
     public function batchVariableAddAction(Request $request)
+```
+
+```php
+use OpenApi\Attributes as OA;
+
+    #[Api\Response200(
+        description: 'Progress',
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(property: 'total', type: 'integer'),
+                new OA\Property(property: 'pending', type: 'integer'),
+            ]
+        ),
+    )]
+    public function progressAction(int $id)
 ```

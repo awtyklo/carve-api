@@ -11,7 +11,7 @@ use OpenApi\Attributes\MediaType;
 use OpenApi\Attributes\XmlContent;
 
 /**
- * Request body with attached 'sorting_field_choices' to content options and description that supports subject parameters.
+ * Request body with description that supports subject parameters. When there is no content (`Nelmio\ApiDocBundle\Annotation\Model` is expected) it set as Api\Resource->batchFormClass. It also attaches 'sorting_field_choices' to content options.
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class RequestBodyBatch extends OA\RequestBody

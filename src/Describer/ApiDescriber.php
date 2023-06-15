@@ -267,12 +267,31 @@ class ApiDescriber implements RouteDescriberInterface
             return;
         }
 
+        $attached = false;
+
         // Find Nelmio\ApiDocBundle\Annotation\Model in attachebles and attach 'sorting_field_choices'
         if (Generator::UNDEFINED !== $requestBody->attachables) {
             foreach ($requestBody->attachables as $attachable) {
                 if ($attachable instanceof NA\Model) {
                     $attachable->options['sorting_field_choices'] = $this->getSortingFieldChoices($reflectionMethod);
+                    $attached = true;
                 }
+            }
+        }
+
+        if (!$attached) {
+            $batchFormClass = $this->apiResourceManager->getAttributeArgument($reflectionMethod, 'batchFormClass');
+            if (null === $batchFormClass) {
+                return;
+            }
+
+            $attachable = new NA\Model(type: $batchFormClass, options: ['sorting_field_choices' => $this->getSortingFieldChoices($reflectionMethod)]);
+
+            // We add Nelmio\ApiDocBundle\Annotation\Model to attachebles of requestBody
+            if (Generator::UNDEFINED === $requestBody->attachables) {
+                $requestBody->attachables = [$attachable];
+            } else {
+                $requestBody->attachables[] = $attachable;
             }
         }
     }
