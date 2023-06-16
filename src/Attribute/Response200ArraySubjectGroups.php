@@ -14,7 +14,7 @@ use OpenApi\Generator;
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Response200ArraySubjectGroups extends OA\Response
 {
-    public $class = Generator::UNDEFINED;
+    private $class = Generator::UNDEFINED;
 
     public function __construct(string $class, ?string $description = 'Returns array of options')
     {
