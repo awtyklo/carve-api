@@ -375,6 +375,7 @@ Supported subject parameters as follows. Example for `subject` = "User".
 -   `#[Api\RequestBodyExportCsv]` - Request body with content set as Api\Resource->exportCsvFormClass (with 'sorting_field_choices', 'filter_filterBy_choices' and 'fields_field_choices' options) and description that supports subject parameters.
 -   `#[Api\RequestBodyExportExcel]` - Request body with content set as Api\Resource->exportExcelFormClass (with 'sorting_field_choices', 'filter_filterBy_choices' and 'fields_field_choices' options) and description that supports subject parameters.
 -   `#[Api\Response200]` - Preconfigured response with code 200 and description that supports subject parameters.
+-   `#[Api\Response200ArraySubjectGroups]` - Preconfigured response with code 200 and default description that supports subject parameters and sets content as array of `Nelmio\ApiDocBundle\Annotation\Model` with given class and serialization groups..
 -   `#[Api\Response200BatchResults]` - Preconfigured list response with code 200 and description that supports subject parameters and sets content as array of `Carve\ApiBundle\Model\BatchResult`.
 -   `#[Api\Response200Groups]` - Preconfigured response with code 200 and description that supports subject parameters and attaches serialization groups to content (`Nelmio\ApiDocBundle\Annotation\Model` is expected as content).
 -   `#[Api\Response200SubjectGroups]` - Preconfigured response with code 200 and description that supports subject parameters and sets content as `Nelmio\ApiDocBundle\Annotation\Model` with subject class and serialization groups.
@@ -384,12 +385,6 @@ Supported subject parameters as follows. Example for `subject` = "User".
 -   `#[Api\Response400]` - Preconfigured response with code 400 and default description (`Unable to process request due to invalid data`) that supports subject parameters.
 -   `#[Api\Response404]` - Preconfigured response with code 404 and description that supports subject parameters.
 -   `#[Api\Response404Id]` - Preconfigured response with code 404 and default description (`{{ subjectTitle }} with specified ID was not found`) that supports subject parameters.
-
-WIP
-
-Common use cases:
-
--   `#[OA\RequestBody(content: new Model(type: AuthenticatedChangePasswordType::class))]`
 
 ### Usage examples
 
@@ -527,4 +522,17 @@ use OpenApi\Attributes as OA;
         ),
     )]
     public function progressAction(int $id)
+```
+
+```php
+class OptionsController extends AbstractApiController
+{
+    #[Rest\Get('/users')]
+    #[Api\Summary('Get users')]
+    #[Api\Response200ArraySubjectGroups(User::class)]
+    public function usersAction()
+    {
+        return $this->getRepository(User::class)->findAll();
+    }
+}
 ```

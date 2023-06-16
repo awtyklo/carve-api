@@ -12,6 +12,7 @@ use Nelmio\ApiDocBundle\OpenApiPhp\Util;
 use Nelmio\ApiDocBundle\RouteDescriber\RouteDescriberInterface;
 use Nelmio\ApiDocBundle\RouteDescriber\RouteDescriberTrait;
 use OpenApi\Annotations as OA;
+use OpenApi\Attributes as OAA;
 use OpenApi\Generator;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\String\Inflector\EnglishInflector;
@@ -36,6 +37,7 @@ class ApiDescriber implements RouteDescriberInterface
         $this->describeParameterPathId($api, $route, $reflectionMethod);
 
         $this->describeResponse200($api, $route, $reflectionMethod);
+        $this->describeResponse200ArraySubjectGroups($api, $route, $reflectionMethod);
         $this->describeResponse200BatchResults($api, $route, $reflectionMethod);
         $this->describeResponse200Groups($api, $route, $reflectionMethod);
         $this->describeResponse200SubjectGroups($api, $route, $reflectionMethod);
@@ -130,6 +132,47 @@ class ApiDescriber implements RouteDescriberInterface
     protected function describeResponse200(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
     {
         $this->findAndApplyResponseSubjectParameters(Api\Response200::class, $api, $route, $reflectionMethod);
+    }
+
+    protected function describeResponse200ArraySubjectGroups(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    {
+        $attribute = $this->getAttribute($reflectionMethod, Api\Response200ArraySubjectGroups::class);
+        if (!$attribute) {
+            return;
+        }
+
+        $response = $this->findAndApplyResponseSubjectParameters(Api\Response200ArraySubjectGroups::class, $api, $route, $reflectionMethod);
+        if (null === $response) {
+            return;
+        }
+
+        // Find Nelmio\ApiDocBundle\Annotation\Model in content and set class and groups
+        if (Generator::UNDEFINED !== $response->content) {
+            foreach ($response->content as $content) {
+                if (!$content instanceof OAA\MediaType) {
+                    continue;
+                }
+
+                $schema = $content->schema;
+                if (!$schema instanceof OAA\Schema) {
+                    continue;
+                }
+
+                $items = $schema->items;
+
+                if (!$items instanceof OAA\Items) {
+                    continue;
+                }
+
+                $model = $items->ref;
+                if (!$model instanceof NA\Model) {
+                    continue;
+                }
+
+                $model->type = $attribute->getClass();
+                $model->groups = $this->getSerializerGroups($reflectionMethod);
+            }
+        }
     }
 
     protected function describeResponse200BatchResults(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
