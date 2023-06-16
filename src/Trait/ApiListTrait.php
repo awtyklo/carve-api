@@ -13,9 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 trait ApiListTrait
 {
     #[Rest\Post('/list')]
-    #[Api\ListDescription]
-    #[Api\ListRequestBody]
-    #[Api\ListResponse200]
+    #[Api\Summary('List {{ subjectPluralLower }}')]
+    #[Api\RequestBodyList]
+    #[Api\Response200List('Returns list of {{ subjectPluralLower }}')]
     #[Api\Response400]
     public function listAction(Request $request)
     {

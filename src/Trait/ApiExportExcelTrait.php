@@ -8,17 +8,17 @@ use Carve\ApiBundle\Attribute as Api;
 use Carve\ApiBundle\Model\ExportExcelQueryInterface;
 use Carve\ApiBundle\View\ExportExcelView;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use OpenApi\Attributes as OA;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 trait ApiExportExcelTrait
 {
     #[Rest\Post('/export/excel')]
-    // TODO Documentation
-    // #[Api\ListDescription]
-    // #[Api\ListRequestBody]
-    // #[Api\ListResponse200]
-    // #[Api\Response400]
+    #[Api\Summary('Export {{ subjectPluralLower }} as Excel')]
+    #[Api\RequestBodyExportExcel]
+    #[Api\Response200(description: 'Exported data as Excel', content: new OA\MediaType(mediaType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', schema: new OA\Schema(type: 'string', format: 'binary')))]
+    #[Api\Response400]
     public function exportExcelAction(Request $request)
     {
         return $this->handleForm($this->getExportExcelFormClass(), $request, [$this, 'processExportExcel'], $this->getExportExcelObject(), $this->getExportExcelFormOptions());

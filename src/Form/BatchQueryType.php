@@ -19,14 +19,10 @@ class BatchQueryType extends AbstractType
             'entry_type' => ListQuerySortingType::class,
             'entry_options' => [
                 'field_choices' => $options['sorting_field_choices'],
-                'documentation' => [
-                    'groups' => $options['documentation']['groups'] ?? null,
-                ],
             ],
             'allow_add' => true,
-            'documentation' => [
-                'description' => 'List of sorting definitions',
-            ],
+            // We need to prepare documentation by hand because Nelmio is not distinguish ListQuerySortingType that have different field_choices set
+            'documentation' => ListQuerySortingType::getDocumentation($options['sorting_field_choices']),
         ]);
         $builder->add('ids', CollectionType::class, [
             'allow_add' => true,

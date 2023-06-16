@@ -11,10 +11,10 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 trait ApiDeleteTrait
 {
     #[Rest\Delete('/{id}', requirements: ['id' => '\d+'])]
-    #[Api\DeleteIdParameter]
-    #[Api\DeleteDescription]
-    #[Api\DeleteResponse204]
-    #[Api\Response404]
+    #[Api\Summary('Delete {{ subjectLower }} by ID')]
+    #[Api\ParameterPathId('ID of {{ subjectLower }} to delete')]
+    #[Api\Response204Delete]
+    #[Api\Response404Id]
     public function deleteAction(int $id)
     {
         $object = $this->find($id, AbstractApiObjectDeny::DELETE);

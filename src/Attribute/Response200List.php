@@ -7,12 +7,16 @@ namespace Carve\ApiBundle\Attribute;
 use Nelmio\ApiDocBundle\Annotation as NA;
 use OpenApi\Attributes as OA;
 
+/**
+ * Preconfigured list response with code 200 and description that supports subject parameters and sets content as object with `rowsCount` and `results` that include items with subject class and serialization groups.
+ */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-class ListResponse200 extends OA\Response
+class Response200List extends OA\Response
 {
-    public function __construct(
-    ) {
-        parent::__construct(response: 200, description: 'Returns list of objects', content: new OA\MediaType(
+    public function __construct(string $description)
+    {
+        // I do not know how to adjust this to similar idea as Response200, Response200Groups or Response200SubjectGroups
+        parent::__construct(response: 200, description: $description, content: new OA\MediaType(
             mediaType: 'application/json',
             schema: new OA\Schema(
                 type: 'object',

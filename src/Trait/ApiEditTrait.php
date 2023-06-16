@@ -13,12 +13,12 @@ use Symfony\Component\HttpFoundation\Request;
 trait ApiEditTrait
 {
     #[Rest\Post('/{id}', requirements: ['id' => '\d+'])]
-    #[Api\EditIdParameter]
-    #[Api\EditDescription]
-    #[Api\EditRequestBody]
-    #[Api\EditResponse200]
+    #[Api\Summary('Edit {{ subjectLower }} by ID')]
+    #[Api\ParameterPathId('ID of {{ subjectLower }} to edit')]
+    #[Api\RequestBodyEdit]
+    #[Api\Response200SubjectGroups('Returns edited {{ subjectLower }}')]
     #[Api\Response400]
-    #[Api\Response404]
+    #[Api\Response404Id]
     public function editAction(Request $request, int $id)
     {
         $object = $this->find($id, AbstractApiObjectDeny::EDIT);

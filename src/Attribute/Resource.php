@@ -101,16 +101,13 @@ class Resource extends OAA\Tag
             'value' => $this->combine($externalDocs, $attachables),
         ];
 
-        switch ($tag) {
-            case false:
-                $properties['name'] = Generator::UNDEFINED;
-                break;
-            case true:
-                $properties['name'] = $this->guessTag($class);
-                break;
-            default:
-                $properties['name'] = $tag;
-                break;
+        // cannot use switch as it uses loose comparision
+        if (false === $tag) {
+            $properties['name'] = Generator::UNDEFINED;
+        } elseif (true === $tag) {
+            $properties['name'] = $this->guessTag($class);
+        } else {
+            $properties['name'] = $tag;
         }
 
         parent::__construct($properties);

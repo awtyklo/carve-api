@@ -11,30 +11,28 @@ use OpenApi\Attributes\MediaType;
 use OpenApi\Attributes\XmlContent;
 
 /**
- * Preconfigured response with code 400 and default description (`Unable to process request due to invalid data`) that supports subject parameters.
+ * Request body with content set as Api\Resource->exportCsvFormClass (with 'sorting_field_choices', 'filter_filterBy_choices' and 'fields_field_choices' options) and description that supports subject parameters.
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-class Response400 extends OA\Response
+class RequestBodyExportCsv extends OA\RequestBody
 {
     public function __construct(
         // $description is moved as first parameter to act as default value
-        ?string $description = 'Unable to process request due to invalid data',
+        ?string $description = null,
         string|object|null $ref = null,
-        int|string $response = 400,
-        ?array $headers = null,
-        MediaType|JsonContent|XmlContent|Attachable|array|null $content = null,
-        ?array $links = null,
+        ?string $request = null,
+        ?bool $required = null,
+        array|MediaType|JsonContent|XmlContent|Attachable|null $content = null,
         // annotation
         ?array $x = null,
         ?array $attachables = null
     ) {
         parent::__construct(
             $ref,
-            $response,
+            $request,
             $description,
-            $headers,
+            $required,
             $content,
-            $links,
             $x,
             $attachables,
         );

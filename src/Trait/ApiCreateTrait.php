@@ -12,9 +12,9 @@ use Symfony\Component\HttpFoundation\Request;
 trait ApiCreateTrait
 {
     #[Rest\Post('/create')]
-    #[Api\CreateDescription]
-    #[Api\CreateRequestBody]
-    #[Api\CreateResponse200]
+    #[Api\Summary('Create {{ subjectLower }}')]
+    #[Api\RequestBodyCreate]
+    #[Api\Response200SubjectGroups('Returns created {{ subjectLower }}')]
     #[Api\Response400]
     public function createAction(Request $request)
     {

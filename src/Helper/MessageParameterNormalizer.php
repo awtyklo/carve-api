@@ -30,4 +30,23 @@ class MessageParameterNormalizer
     {
         return str_replace(['{{ ', ' }}'], '', $parameter);
     }
+
+    /**
+     * Apply parameters to message. Example usage:
+     * $message = "Hello {{ name }}"
+     * $parameters = ["name" => "John"]
+     * Returns: "Hello John".
+     */
+    public static function applyParameters(string $message, array $parameters): string
+    {
+        $search = [];
+        $replace = [];
+
+        foreach ($parameters as $parameter => $value) {
+            $search[] = '{{ '.$parameter.' }}';
+            $replace[] = $value;
+        }
+
+        return str_replace($search, $replace, $message);
+    }
 }

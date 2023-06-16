@@ -11,10 +11,10 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 trait ApiGetTrait
 {
     #[Rest\Get('/{id}', requirements: ['id' => '\d+'])]
-    #[Api\GetIdParameter]
-    #[Api\GetDescription]
-    #[Api\GetResponse200]
-    #[Api\Response404]
+    #[Api\Summary('Get {{ subjectLower }} by ID')]
+    #[Api\ParameterPathId('ID of {{ subjectLower }} to return')]
+    #[Api\Response200SubjectGroups]
+    #[Api\Response404Id]
     public function getAction(int $id)
     {
         $object = $this->find($id, AbstractApiObjectDeny::GET);

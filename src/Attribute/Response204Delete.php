@@ -11,16 +11,16 @@ use OpenApi\Attributes\MediaType;
 use OpenApi\Attributes\XmlContent;
 
 /**
- * Preconfigured response with code 400 and default description (`Unable to process request due to invalid data`) that supports subject parameters.
+ * Preconfigured response with code 204 and default description (`{{ subjectTitle }} successfully deleted`) that supports subject parameters.
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-class Response400 extends OA\Response
+class Response204Delete extends OA\Response
 {
     public function __construct(
         // $description is moved as first parameter to act as default value
-        ?string $description = 'Unable to process request due to invalid data',
+        ?string $description = '{{ subjectTitle }} successfully deleted',
         string|object|null $ref = null,
-        int|string $response = 400,
+        int|string $response = 204,
         ?array $headers = null,
         MediaType|JsonContent|XmlContent|Attachable|array|null $content = null,
         ?array $links = null,
