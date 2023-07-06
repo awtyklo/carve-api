@@ -16,7 +16,6 @@ use Carve\ApiBundle\Model\ListQuerySortingInterface;
 use Carve\ApiBundle\Service\Helper\ApiResourceManagerTrait;
 use Carve\ApiBundle\Service\Helper\DenyManagerTrait;
 use Carve\ApiBundle\Service\Helper\EntityManagerTrait;
-use Carve\ApiBundle\Service\Helper\RoleBasedSerializerGroupsManagerTrait;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -34,7 +33,6 @@ abstract class AbstractApiController extends AbstractFOSRestController
     use EntityManagerTrait;
     use DenyManagerTrait;
     use ApiResourceManagerTrait;
-    use RoleBasedSerializerGroupsManagerTrait;
 
     protected function modifyResponseObject(object $object): void
     {

@@ -3,7 +3,8 @@
 namespace Carve\ApiBundle\EventListener;
 
 use Carve\ApiBundle\Serializer\Normalizer\ExportEnumNormalizer;
-use Carve\ApiBundle\Service\Helper\RoleBasedSerializerGroupsManagerTrait;
+use Carve\ApiBundle\Service\ApiResourceManager;
+use Carve\ApiBundle\Service\Helper\ApiResourceManagerTrait;
 use Carve\ApiBundle\View\ExportCsvView;
 use Carve\ApiBundle\View\ExportExcelView;
 use FOS\RestBundle\Controller\Annotations\View as ViewAnnotation;
@@ -26,7 +27,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class ViewResponseListener implements EventSubscriberInterface
 {
-    use RoleBasedSerializerGroupsManagerTrait;
+    use ApiResourceManagerTrait;
 
     private $viewHandler;
     private $forceView;
@@ -66,25 +67,35 @@ class ViewResponseListener implements EventSubscriberInterface
             if (null !== $configuration->getStatusCode() && (null === $view->getStatusCode() || Response::HTTP_OK === $view->getStatusCode())) {
                 $view->setStatusCode($configuration->getStatusCode());
             }
+
             $context = $view->getContext();
-            if ($configuration->getSerializerGroups()) {
-                if (null === $context->getGroups()) {
-                    $context->setGroups($configuration->getSerializerGroups());
-                } else {
-                    $context->setGroups(array_merge($context->getGroups(), $configuration->getSerializerGroups()));
-                }
+
+            $groups = $context->getGroups();
+            if (null === $groups) {
+                // Initialize with empty array for easy processing
+                $groups = [];
             }
 
-            if (null === $context->getGroups()) {
-                $context->setGroups(array_unique($this->getRoleBasedSerializerGroupsByOwner($configuration->getOwner())));
-            } else {
-                $context->setGroups(array_unique(array_merge($context->getGroups(), $this->getRoleBasedSerializerGroupsByOwner($configuration->getOwner()))));
+            if ($configuration->getSerializerGroups()) {
+                $groups = array_merge($groups, $configuration->getSerializerGroups());
             }
+
+            $ownerReflectionClass = ApiResourceManager::getFosRestAnnotationViewOwnerReflectionClass($configuration->getOwner());
+            $groups = array_merge($groups, $this->apiResourceManager->getRoleBasedSerializerGroups($ownerReflectionClass));
 
             if (null !== $exportView) {
                 // Extend groups with a custom 'special:export' group when handling export view
-                $context->setGroups(array_merge($context->getGroups(), [ExportEnumNormalizer::EXPORT_GROUP]));
+                $groups = array_merge($groups, [ExportEnumNormalizer::EXPORT_GROUP]);
             }
+
+            if (null === $context->getGroups() && 0 === count($groups)) {
+                // Revert to null when groups are still empty, but only when they were initially also initially
+                $groups = null;
+            } else {
+                $groups = array_unique($groups);
+            }
+
+            $context->setGroups($groups);
 
             if (true === $configuration->getSerializerEnableMaxDepthChecks()) {
                 $context->enableMaxDepth();

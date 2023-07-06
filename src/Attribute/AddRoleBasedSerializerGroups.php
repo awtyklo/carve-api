@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Carve\ApiBundle\Attribute;
 
+/**
+ * This extends serialization groups for sorting, filtering and export as well.
+ */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class AddRoleBasedSerializerGroups
 {

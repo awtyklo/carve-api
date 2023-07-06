@@ -6,13 +6,17 @@ use Carve\ApiBundle\Attribute as Api;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use OpenApi\Generator;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\Security\Core\Security;
 
 class ApiResourceManager
 {
+    protected Security $security;
+
     protected PropertyListExtractorInterface $serializerExtractor;
 
-    public function __construct(PropertyListExtractorInterface $serializerExtractor)
+    public function __construct(Security $security, PropertyListExtractorInterface $serializerExtractor)
     {
+        $this->security = $security;
         $this->serializerExtractor = $serializerExtractor;
     }
 
@@ -29,6 +33,12 @@ class ApiResourceManager
                 // Fake group to avoid using empty serializer groups which leads to serializing everything
                 $fieldSerializerGroups = ['__invalid__'];
             }
+        }
+
+        // Extend with role based serializer groups (only supported with \ReflectionClass)
+        if ($reflection instanceof \ReflectionClass) {
+            $roleBasedSerializerGroups = $this->getRoleBasedSerializerGroups($reflection);
+            $fieldSerializerGroups = array_unique(array_merge($fieldSerializerGroups, $roleBasedSerializerGroups));
         }
 
         $class = $this->getAttributeArgument($reflection, 'class');
@@ -56,6 +66,12 @@ class ApiResourceManager
             }
         }
 
+        // Extend with role based serializer groups (only supported with \ReflectionClass)
+        if ($reflection instanceof \ReflectionClass) {
+            $roleBasedSerializerGroups = $this->getRoleBasedSerializerGroups($reflection);
+            $filterBySerializerGroups = array_unique(array_merge($filterBySerializerGroups, $roleBasedSerializerGroups));
+        }
+
         $class = $this->getAttributeArgument($reflection, 'class');
         $filterByChoices = $this->serializerExtractor->getProperties($class, ['serializer_groups' => $filterBySerializerGroups]);
 
@@ -79,6 +95,12 @@ class ApiResourceManager
                 // Fake group to avoid using empty serializer groups which leads to serializing everything
                 $sortingSerializerGroups = ['__invalid__'];
             }
+        }
+
+        // Extend with role based serializer groups (only supported with \ReflectionClass)
+        if ($reflection instanceof \ReflectionClass) {
+            $roleBasedSerializerGroups = $this->getRoleBasedSerializerGroups($reflection);
+            $sortingSerializerGroups = array_unique(array_merge($sortingSerializerGroups, $roleBasedSerializerGroups));
         }
 
         $class = $this->getAttributeArgument($reflection, 'class');
@@ -203,6 +225,38 @@ class ApiResourceManager
         }
 
         return $serializerGroups;
+    }
+
+    public function getRoleBasedSerializerGroups(\ReflectionClass $reflection): array
+    {
+        $serializerGroups = [];
+        foreach ($reflection->getAttributes(Api\AddRoleBasedSerializerGroups::class) as $attribute) {
+            $attributeInstance = $attribute->newInstance();
+            $roleAttribute = $attributeInstance->getAttribute();
+
+            if ($roleAttribute && $this->security->isGranted($roleAttribute)) {
+                $serializerGroups = array_merge($serializerGroups, $attributeInstance->getSerializerGroups());
+            }
+        }
+
+        return array_unique($serializerGroups);
+    }
+
+    public static function getFosRestAnnotationViewOwnerReflectionClass(array $owner): \ReflectionClass
+    {
+        if (!isset($owner[0])) {
+            throw new \Exception('Owner not provided in view');
+        }
+
+        if (\is_string($owner[0])) {
+            $class = $owner[0];
+        } elseif (\is_object($owner[0])) {
+            $class = \get_class($owner[0]);
+        } else {
+            throw new \Exception('Owner not provided in view');
+        }
+
+        return new \ReflectionClass($class);
     }
 
     public static function appendChoices(array $choices, array $appendChoices): array
