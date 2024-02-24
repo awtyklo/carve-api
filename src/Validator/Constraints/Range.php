@@ -11,9 +11,9 @@ class Range extends Assert\Range
 {
     public function __construct(
         ?array $options = null,
-        ?string $notInRangeMessage = 'validation.rangeNotIn',
-        ?string $minMessage = 'validation.rangeMin',
-        ?string $maxMessage = 'validation.rangeMax',
+        ?string $notInRangeMessage = null,
+        ?string $minMessage = null,
+        ?string $maxMessage = null,
         ?string $invalidMessage = 'validation.rangeNumber',
         ?string $invalidDateTimeMessage = 'validation.rangeDateTime',
         mixed $min = null,
@@ -23,11 +23,13 @@ class Range extends Assert\Range
         ?array $groups = null,
         mixed $payload = null
     ) {
+        $isNotInRange = null !== $min && null !== $max ? true : false;
+
         parent::__construct(
             $options,
-            $notInRangeMessage,
-            $minMessage,
-            $maxMessage,
+            null !== $notInRangeMessage ? $notInRangeMessage : ($isNotInRange ? 'validation.rangeNotIn' : null),
+            null !== $minMessage ? $minMessage : (!$isNotInRange ? 'validation.rangeMin' : null),
+            null !== $maxMessage ? $maxMessage : (!$isNotInRange ? 'validation.rangeMax' : null),
             $invalidMessage,
             $invalidDateTimeMessage,
             $min,
