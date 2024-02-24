@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ExportQueryFieldType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Note: Fields for this form are documented for Nelmio in ListQuerySortingType. Read more there.
         $builder->add('field', ChoiceType::class, [
@@ -23,7 +23,7 @@ class ExportQueryFieldType extends AbstractType
         $builder->add('label');
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => ExportQueryField::class,

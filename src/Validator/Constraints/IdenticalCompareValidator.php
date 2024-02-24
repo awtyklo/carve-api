@@ -13,7 +13,7 @@ class IdenticalCompareValidator extends ConstraintValidator
 {
     private $propertyAccessor;
 
-    public function validate($protocol, Constraint $constraint)
+    public function validate($protocol, Constraint $constraint): void
     {
         $value1 = $this->getPropertyAccessor()->getValue($protocol, $constraint->propertyPath1);
         $value2 = $this->getPropertyAccessor()->getValue($protocol, $constraint->propertyPath2);

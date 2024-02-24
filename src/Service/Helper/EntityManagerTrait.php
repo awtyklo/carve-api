@@ -6,6 +6,7 @@ namespace Carve\ApiBundle\Service\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait EntityManagerTrait
 {
@@ -14,9 +15,7 @@ trait EntityManagerTrait
      */
     protected $entityManager;
 
-    /**
-     * @required
-     */
+    #[Required]
     public function setEntityManager(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;

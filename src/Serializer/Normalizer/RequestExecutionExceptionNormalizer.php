@@ -42,4 +42,13 @@ class RequestExecutionExceptionNormalizer implements NormalizerInterface
 
         return RequestExecutionException::class === $data->getClass();
     }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        // In Symfony 5.4 results where not cached by default. Adjust when needed.
+        return [
+            'object' => false,
+            '*' => false,
+        ];
+    }
 }

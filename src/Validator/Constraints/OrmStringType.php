@@ -26,7 +26,6 @@ class OrmStringType extends Length
         $payload = null,
         array $options = []
     ) {
-        // Is there a better options to set up $max as 255?
         parent::__construct($exactly, $min, $max, $charset, $normalizer, $exactMessage, $minMessage, $maxMessage, $charsetMessage, $groups, $payload, $options);
     }
 
