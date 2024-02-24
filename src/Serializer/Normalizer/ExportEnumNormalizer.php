@@ -14,11 +14,11 @@ use ReflectionClass;
 use ReflectionProperty;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExportEnumNormalizer implements ContextAwareNormalizerInterface
+class ExportEnumNormalizer implements NormalizerInterface
 {
     public const EXPORT_GROUP = 'special:export';
 
@@ -143,5 +143,14 @@ class ExportEnumNormalizer implements ContextAwareNormalizerInterface
         }
 
         return substr($class, $pos + Proxy::MARKER_LENGTH + 2);
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        // In Symfony 5.4 results where not cached by default. Adjust when needed.
+        return [
+            'object' => false,
+            '*' => false,
+        ];
     }
 }

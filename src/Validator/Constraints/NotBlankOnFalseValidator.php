@@ -15,7 +15,7 @@ class NotBlankOnFalseValidator extends NotBlankValidator
 {
     private $propertyAccessor;
 
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         $path = $constraint->propertyPath;
         $object = $this->context->getObject();
