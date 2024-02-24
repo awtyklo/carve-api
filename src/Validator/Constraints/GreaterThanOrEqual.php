@@ -9,7 +9,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class GreaterThanOrEqual extends Assert\GreaterThanOrEqual
 {
-    public $message = 'validation.greaterThanOrEqual';
+    public function __construct(mixed $value = null, ?string $propertyPath = null, ?string $message = 'validation.greaterThanOrEqual', ?array $groups = null, mixed $payload = null, array $options = [])
+    {
+        parent::__construct(
+            $value,
+            $propertyPath,
+            $message,
+            $groups,
+            $payload,
+            $options,
+        );
+    }
 
     public function validatedBy(): string
     {
