@@ -22,7 +22,7 @@ class Count extends Assert\Count
         mixed $payload = null,
         array $options = []
     ) {
-        parent::__construct($options,
+        parent::__construct(
             $exactly,
             $min,
             $max,
