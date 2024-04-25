@@ -536,3 +536,25 @@ class OptionsController extends AbstractApiController
     }
 }
 ```
+
+## Development
+
+### Running tests
+
+Use `composer` to download packages (including PHPUnit).
+
+```
+composer install
+```
+
+Verify PHPUnit installation. Following command should return version of PHPUnit.
+
+```
+php vendor/bin/phpunit --version
+```
+
+Run tests.
+
+```
+php vendor/bin/phpunit
+```
