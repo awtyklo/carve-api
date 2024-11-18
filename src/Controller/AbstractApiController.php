@@ -72,6 +72,13 @@ abstract class AbstractApiController extends AbstractFOSRestController
             throw new NotFoundHttpException();
         }
 
+        $this->applyDeny($object, $denyKey);
+
+        return $object;
+    }
+
+    protected function applyDeny(object $object, string $denyKey): void
+    {
         if (null !== $denyKey && $this->hasDenyClass()) {
             $denyClass = $this->getDenyClass();
             if ($this->isDenied($denyClass, $denyKey, $object)) {
@@ -80,8 +87,6 @@ abstract class AbstractApiController extends AbstractFOSRestController
 
             $this->fillDeny($denyClass, $object);
         }
-
-        return $object;
     }
 
     protected function batchProcess(callable $process, BatchQueryInterface $batchQuery, FormInterface $form, ?string $denyKey = null, ?callable $postProcess = null)

@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class RequestExecutionExceptionNormalizer implements NormalizerInterface
 {
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $exception = $context['exception'] ?? null;
         if (!$exception || !($exception instanceof RequestExecutionException)) {
@@ -34,7 +34,7 @@ class RequestExecutionExceptionNormalizer implements NormalizerInterface
         ];
     }
 
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         if (!($data instanceof FlattenException)) {
             return false;

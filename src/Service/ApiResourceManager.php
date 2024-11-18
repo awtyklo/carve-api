@@ -5,8 +5,8 @@ namespace Carve\ApiBundle\Service;
 use Carve\ApiBundle\Attribute as Api;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use OpenApi\Generator;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
-use Symfony\Component\Security\Core\Security;
 
 class ApiResourceManager
 {
