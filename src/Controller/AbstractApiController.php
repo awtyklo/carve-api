@@ -16,7 +16,7 @@ use Carve\ApiBundle\Model\ListQuerySortingInterface;
 use Carve\ApiBundle\Service\Helper\ApiResourceManagerTrait;
 use Carve\ApiBundle\Service\Helper\DenyManagerTrait;
 use Carve\ApiBundle\Service\Helper\EntityManagerTrait;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -448,7 +448,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
         $metadataClass = $classMetadataFactory->getMetadataFor($this->getClass());
 
         if (isset($metadataClass->associationMappings[$field])) {
-            if (ClassMetadataInfo::MANY_TO_MANY == $metadataClass->associationMappings[$field]['type']) {
+            if (ClassMetadata::MANY_TO_MANY == $metadataClass->associationMappings[$field]['type']) {
                 return true;
             }
         }
