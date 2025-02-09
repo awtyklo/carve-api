@@ -26,7 +26,7 @@ You can use following branches:
 
 # Release
 
-Add new release on GitHub. It should be automatically synchronized by packagist. Remember to add tag (i.e. `3.0.1`) as well.
+Add new release on GitHub. It should be automatically synchronized by packagist. Remember to add tag when adding new release (i.e. `3.0.1`) as well.
 
 ## Configuration
 
