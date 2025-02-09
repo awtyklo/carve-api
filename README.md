@@ -24,6 +24,10 @@ You can use following branches:
 2. `v2.x` - branch for version `2.x` (Symfony 6.4)
 3. `v1.x` - branch for version `1.x` (Symfony 5.4)
 
+# Release
+
+Add new release on GitHub. It should be automatically synchronized by packagist. Remember to add tag (i.e. `3.0.1`) as well.
+
 ## Configuration
 
 Add in `config/packages/doctrine.yaml`. It will enable storing `Types::DATETIME_MUTABLE` always in UTC timezone.
