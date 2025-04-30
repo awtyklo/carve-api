@@ -186,6 +186,10 @@ class ViewResponseListener implements EventSubscriberInterface
     {
         return array_map(function ($result) {
             return array_map(function ($value) {
+                if (is_bool($value)) {
+                    return $value ? 'TRUE' : 'FALSE';
+                }
+
                 if (isset($value['representation'])) {
                     return $value['representation'];
                 }
