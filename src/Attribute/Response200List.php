@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Carve\ApiBundle\Attribute;
 
-use Nelmio\ApiDocBundle\Annotation as NA;
+use Nelmio\ApiDocBundle\Attribute as NA;
 use OpenApi\Attributes as OA;
 
 /**
