@@ -7,14 +7,12 @@ namespace Carve\ApiBundle\Validator\Constraints;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-class Length extends Assert\Length
+class IsNull extends Assert\IsNull
 {
-    public string $maxMessage = 'validation.lengthMax';
-    public string $minMessage = 'validation.lengthMin';
-    public string $exactMessage = 'validation.lengthExact';
+    public string $message = 'validation.isNull';
 
     public function validatedBy(): string
     {
-        return Assert\LengthValidator::class;
+        return Assert\IsNullValidator::class;
     }
 }

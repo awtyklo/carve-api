@@ -30,7 +30,7 @@ class ApiDescriber implements RouteDescriberInterface
         $this->apiResourceManager = $apiResourceManager;
     }
 
-    public function describe(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod)
+    public function describe(OA\OpenApi $api, Route $route, \ReflectionMethod $reflectionMethod): void
     {
         $this->describeSummary($api, $route, $reflectionMethod);
         $this->describeParameter($api, $route, $reflectionMethod);
