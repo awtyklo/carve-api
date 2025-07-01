@@ -3,6 +3,11 @@
         "requestExecutionFailed": "Operation has failed"
     },
     "validation": {
+        "isFalse": "This value should be false",
+        "isTrue": "This value should be true",
+        "isNull": "This value should be null",
+        "notNull": "This value should not be null",
+        "blank": "This value should be blank",
         "required": "This value is required",
         "enum": "This is not a valid value",
         "integerType": "This value is not a valid integer",
