@@ -77,16 +77,22 @@ abstract class AbstractApiController extends AbstractFOSRestController
         return $object;
     }
 
-    protected function applyDeny(object $object, string $denyKey): void
+    protected function applyDeny(object $object, ?string $denyKey = null): void
     {
-        if (null !== $denyKey && $this->hasDenyClass()) {
-            $denyClass = $this->getDenyClass();
-            if ($this->isDenied($denyClass, $denyKey, $object)) {
-                throw new AccessDeniedHttpException();
-            }
-
-            $this->fillDeny($denyClass, $object);
+        if (null === $denyKey) {
+            return;
         }
+
+        if (!$this->hasDenyClass()) {
+            return;
+        }
+
+        $denyClass = $this->getDenyClass();
+        if ($this->isDenied($denyClass, $denyKey, $object)) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $this->fillDeny($denyClass, $object);
     }
 
     protected function batchProcess(callable $process, BatchQueryInterface $batchQuery, FormInterface $form, ?string $denyKey = null, ?callable $postProcess = null)

@@ -20,7 +20,7 @@ Build with:
 
 You can use following branches:
 
-1. `main` (default) - branch for current version `3.x` (Symfony 7.1)
+1. `main` (default) - branch for current version `3.x` (Symfony 7.3)
 2. `v2.x` - branch for version `2.x` (Symfony 6.4)
 3. `v1.x` - branch for version `1.x` (Symfony 5.4)
 
