@@ -14,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -51,6 +52,12 @@ class ListQueryFilterType extends AbstractType
                 case ListQueryFilterTypeEnum::STARTSWITH:
                 case ListQueryFilterTypeEnum::ENDSWITH:
                     $form->add('filterValue', TextType::class, $options);
+                    break;
+                case ListQueryFilterTypeEnum::GREATERTHAN:
+                case ListQueryFilterTypeEnum::GREATERTHANOREQUAL:
+                case ListQueryFilterTypeEnum::LESSTHAN:
+                case ListQueryFilterTypeEnum::LESSTHANOREQUAL:
+                    $form->add('filterValue', NumberType::class, $options);
                     break;
                 case ListQueryFilterTypeEnum::EQUALMULTIPLE:
                     $form->add('filterValue', CollectionType::class, [

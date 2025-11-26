@@ -13,7 +13,7 @@ class DateModifier extends Constraint
     public $message = 'validation.dateModifier';
 
     #[HasNamedArguments]
-    public function __construct(string $message = null, array $groups = null, $payload = null)
+    public function __construct(?string $message = null, ?array $groups = null, $payload = null)
     {
         $options = array_filter([
             'message' => $message ?? $this->message,
