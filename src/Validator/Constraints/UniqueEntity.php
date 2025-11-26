@@ -10,33 +10,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class UniqueEntity extends BaseUniqueEntity
 {
-    public function __construct(
-        $fields,
-        ?string $message = 'validation.uniqueEntity',
-        ?string $service = null,
-        ?string $em = null,
-        ?string $entityClass = null,
-        ?string $repositoryMethod = null,
-        ?string $errorPath = null,
-        bool|string|array|null $ignoreNull = null,
-        ?array $groups = null,
-        $payload = null,
-        array $options = []
-    ) {
-        parent::__construct(
-            $fields,
-            $message,
-            $service,
-            $em,
-            $entityClass,
-            $repositoryMethod,
-            $errorPath,
-            $ignoreNull,
-            $groups,
-            $payload,
-            $options,
-        );
-    }
+    public $message = 'validation.uniqueEntity';
 
     public function validatedBy(): string
     {

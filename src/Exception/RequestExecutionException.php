@@ -11,7 +11,7 @@ class RequestExecutionException extends ConflictHttpException
 
     protected $payload = null;
 
-    public function __construct(?string $error = null, array $parameters = [], ?RequestExecutionExceptionSeverity $severity = RequestExecutionExceptionSeverity::ERROR, ?string $message = '', \Throwable $previous = null, int $code = 0, array $headers = [])
+    public function __construct(?string $error = null, array $parameters = [], ?RequestExecutionExceptionSeverity $severity = RequestExecutionExceptionSeverity::ERROR, ?string $message = '', ?\Throwable $previous = null, int $code = 0, array $headers = [])
     {
         parent::__construct($message, $previous, $code, $headers);
 

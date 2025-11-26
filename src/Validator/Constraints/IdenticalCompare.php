@@ -15,7 +15,7 @@ class IdenticalCompare extends Constraint
     public $propertyPath2;
 
     #[HasNamedArguments]
-    public function __construct(string $propertyPath1 = null, string $propertyPath2 = null, string $message = null, array $groups = null, $payload = null)
+    public function __construct(?string $propertyPath1 = null, ?string $propertyPath2 = null, ?string $message = null, ?array $groups = null, $payload = null)
     {
         $options = array_filter([
             'message' => $message ?? $this->message,

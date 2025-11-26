@@ -58,7 +58,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
         return false;
     }
 
-    protected function find(int $id, ?string $denyKey = null, callable $modifyQueryBuilder = null, string $alias = 'o'): object
+    protected function find(int $id, ?string $denyKey = null, ?callable $modifyQueryBuilder = null, string $alias = 'o'): object
     {
         $queryBuilder = $this->getQueryBuilder($modifyQueryBuilder, $alias);
 
@@ -152,7 +152,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
         return $this->getDefaultBatchFormOptions();
     }
 
-    protected function getBatchQueryBuilder(BatchQueryInterface $batchQuery, callable $modifyQueryBuilder = null, string $alias = 'o'): QueryBuilder
+    protected function getBatchQueryBuilder(BatchQueryInterface $batchQuery, ?callable $modifyQueryBuilder = null, string $alias = 'o'): QueryBuilder
     {
         $queryBuilder = $this->getQueryBuilder($modifyQueryBuilder, $alias);
         $queryBuilder->distinct();
@@ -165,7 +165,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
         return $queryBuilder;
     }
 
-    protected function getListQueryBuilder(ListQueryInterface $listQuery, callable $modifyQueryBuilder = null, string $alias = 'o'): QueryBuilder
+    protected function getListQueryBuilder(ListQueryInterface $listQuery, ?callable $modifyQueryBuilder = null, string $alias = 'o'): QueryBuilder
     {
         $queryBuilder = $this->getQueryBuilder($modifyQueryBuilder, $alias);
         $queryBuilder->distinct();
@@ -181,7 +181,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
         return $queryBuilder;
     }
 
-    protected function getExportQueryBuilder(ExportQueryInterface $exportQuery, callable $modifyQueryBuilder = null, string $alias = 'o'): QueryBuilder
+    protected function getExportQueryBuilder(ExportQueryInterface $exportQuery, ?callable $modifyQueryBuilder = null, string $alias = 'o'): QueryBuilder
     {
         $queryBuilder = $this->getQueryBuilder($modifyQueryBuilder, $alias);
         $queryBuilder->distinct();
@@ -330,7 +330,7 @@ abstract class AbstractApiController extends AbstractFOSRestController
         }
     }
 
-    protected function getQueryBuilder(callable $modifyQueryBuilder = null, string $alias = 'o'): QueryBuilder
+    protected function getQueryBuilder(?callable $modifyQueryBuilder = null, string $alias = 'o'): QueryBuilder
     {
         $queryBuilder = $this->getRepository($this->getClass())->createQueryBuilder($alias);
 
