@@ -6,7 +6,7 @@ IMPORTANT! Work in progress.
 
 Offers consistent and reusable way of composing REST API endpoints
 Allows single-minded endpoint customization
-Automaticly generates OpenAPI documentation
+Automatically generates OpenAPI documentation
 Introduces deny functionality to allow easier access control that includes feedback messages
 Adds layer of constraints that have REST API friendly messages
 
@@ -20,7 +20,7 @@ Build with:
 
 You can use following branches:
 
-1. `main` (default) - branch for current version `3.x` (Symfony 7.3)
+1. `main` (default) - branch for current version `3.x` (Symfony 7.4)
 2. `v2.x` - branch for version `2.x` (Symfony 6.4)
 3. `v1.x` - branch for version `1.x` (Symfony 5.4)
 
