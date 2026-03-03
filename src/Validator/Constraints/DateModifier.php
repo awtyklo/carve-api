@@ -10,15 +10,16 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class DateModifier extends Constraint
 {
-    public $message = 'validation.dateModifier';
+    public string $message = 'validation.dateModifier';
 
     #[HasNamedArguments]
-    public function __construct(string $message = null, array $groups = null, $payload = null)
-    {
-        $options = array_filter([
-            'message' => $message ?? $this->message,
-        ]);
+    public function __construct(
+        ?string $message = null,
+        ?array $groups = null,
+        mixed $payload = null,
+    ) {
+        parent::__construct(null, $groups, $payload);
 
-        parent::__construct($options, $groups, $payload);
+        $this->message = $message ?? $this->message;
     }
 }

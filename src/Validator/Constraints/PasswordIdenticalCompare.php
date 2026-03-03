@@ -7,7 +7,7 @@ namespace Carve\ApiBundle\Validator\Constraints;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class PasswordIdenticalCompare extends IdenticalCompare
 {
-    public $message = 'validation.passwordIdenticalCompare';
+    public string $message = 'validation.passwordIdenticalCompare';
 
     public function validatedBy(): string
     {
