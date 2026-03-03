@@ -38,7 +38,7 @@ final class FormModelDescriber implements ModelDescriberInterface, ModelRegistry
     private $doctrineReader;
     private $mediaTypes;
 
-    public function __construct(FormFactoryInterface $formFactory = null, Reader $reader = null, array $mediaTypes = null)
+    public function __construct(?FormFactoryInterface $formFactory = null, ?Reader $reader = null, ?array $mediaTypes = null)
     {
         $this->formFactory = $formFactory;
         $this->doctrineReader = $reader;

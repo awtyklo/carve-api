@@ -36,7 +36,7 @@ class ExportEnumNormalizer implements NormalizerInterface
         $this->translator = $translator;
     }
 
-    public function normalize($object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize($object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $data = $this->normalizer->normalize($object, $format, $context);
 
@@ -51,7 +51,7 @@ class ExportEnumNormalizer implements NormalizerInterface
         return $data;
     }
 
-    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         if (!in_array(self::EXPORT_GROUP, $context['groups'] ?? [])) {
             return false;
