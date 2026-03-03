@@ -15,7 +15,7 @@ class UTCDateTimeType extends DateTimeType
      */
     private static $utc;
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
+    public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
         if ($value instanceof \DateTime) {
             $value->setTimezone(self::getUtc());
@@ -24,7 +24,7 @@ class UTCDateTimeType extends DateTimeType
         return parent::convertToDatabaseValue($value, $platform);
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform): mixed
+    public function convertToPHPValue($value, AbstractPlatform $platform): ?\DateTime
     {
         if (null === $value || $value instanceof \DateTime) {
             return $value;

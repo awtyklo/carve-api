@@ -44,7 +44,7 @@ class ViewResponseListener implements EventSubscriberInterface
      */
     private $annotationReader;
 
-    public function __construct(ViewHandlerInterface $viewHandler, bool $forceView, ?Reader $annotationReader = null)
+    public function __construct(ViewHandlerInterface $viewHandler, bool $forceView = true, ?Reader $annotationReader = null)
     {
         $this->viewHandler = $viewHandler;
         $this->forceView = $forceView;
