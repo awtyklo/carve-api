@@ -29,8 +29,8 @@ class Url extends Assert\Url
             protocols: $protocols,
             relativeProtocol: $relativeProtocol,
             normalizer: $normalizer,
-            // Default to true. Not setting the requireTld option is deprecated since Symfony 7.1 and will default to true in Symfony 8.0.
-            requireTld: $requireTld ?? true,
+            // Default to false. Not setting the requireTld option is deprecated since Symfony 7.1 and will default to true in Symfony 8.0.
+            requireTld: $requireTld ?? false,
             tldMessage: $tldMessage,
             groups: $groups,
             payload: $payload
