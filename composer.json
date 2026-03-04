@@ -21,7 +21,7 @@
     "require": {
         "php": ">=8.5",
         "symfony/framework-bundle": "7.4.*",
-        "nelmio/api-doc-bundle": "^5.0",
+        "nelmio/api-doc-bundle": "4.26.2",
         "friendsofsymfony/rest-bundle": "^3.3",
         "symfony/serializer": "7.4.*",
         "symfony/translation": "7.4.*",

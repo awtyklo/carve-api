@@ -10,28 +10,19 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class IdenticalCompare extends Constraint
 {
-    public $message = 'validation.identicalCompare';
-    public $propertyPath1;
-    public $propertyPath2;
+    public string $message = 'validation.identicalCompare';
 
     #[HasNamedArguments]
-    public function __construct(string $propertyPath1 = null, string $propertyPath2 = null, string $message = null, array $groups = null, $payload = null)
-    {
-        $options = array_filter([
-            'message' => $message ?? $this->message,
-            'propertyPath1' => $propertyPath1 ?? $this->propertyPath1,
-            'propertyPath2' => $propertyPath2 ?? $this->propertyPath2,
-        ]);
+    public function __construct(
+        public string $propertyPath1,
+        public string $propertyPath2,
+        ?string $message = null,
+        ?array $groups = null,
+        mixed $payload = null,
+    ) {
+        parent::__construct(null, $groups, $payload);
 
-        parent::__construct($options, $groups, $payload);
-    }
-
-    public function getRequiredOptions(): array
-    {
-        return [
-            'propertyPath1',
-            'propertyPath2',
-        ];
+        $this->message = $message ?? $this->message;
     }
 
     public function getTargets(): array|string

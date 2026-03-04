@@ -4,27 +4,26 @@ declare(strict_types=1);
 
 namespace Carve\ApiBundle\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class NotBlankOnTrue extends NotBlank
 {
-    public $propertyPath;
+    public string $message = 'validation.required';
 
     #[HasNamedArguments]
-    public function __construct(array $options = null, string $propertyPath = null, string $message = 'validation.required', bool $allowNull = null, callable $normalizer = null, array $groups = null, $payload = null)
-    {
-        $options = array_filter([
-            'propertyPath' => $propertyPath ?? $this->propertyPath,
-        ]);
+    public function __construct(
+        public string $propertyPath,
+        ?string $message = null,
+        ?array $groups = null,
+        mixed $payload = null,
+    ) {
+        parent::__construct(
+            groups: $groups,
+            payload: $payload
+        );
 
-        parent::__construct($options, $message, $allowNull, $normalizer, $groups, $payload);
-    }
-
-    public function getRequiredOptions(): array
-    {
-        return [
-            'propertyPath',
-        ];
+        $this->message = $message ?? $this->message;
     }
 }
