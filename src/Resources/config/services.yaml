@@ -20,7 +20,8 @@ services:
             - "@translator"
         tags: ["serializer.normalizer"]
 
-    carve_api.form.type_guesser.doctrine_enum_type_guesser:
+    # Overwrite default Symfony\Component\Form\EnumTypeGuesser to avoid invalid guess of required for enum types based on typehinting
+    form.type_guesser.enum_type:
         class: Carve\ApiBundle\Form\TypeGuesser\DoctrineEnumTypeGuesser
         arguments:
             - "@doctrine"
