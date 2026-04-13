@@ -4,10 +4,10 @@ namespace Carve\ApiBundle\Form\TypeGuesser;
 
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
+use Doctrine\ORM\Mapping\PropertyAccessors\EnumPropertyAccessor;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\Proxy;
-use Doctrine\Persistence\Reflection\EnumReflectionProperty;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
@@ -37,11 +37,11 @@ class DoctrineEnumTypeGuesser implements FormTypeGuesserInterface
             return null;
         }
 
-        $reflectionProperty = $metadata->getReflectionProperty($property);
-        if ($reflectionProperty instanceof EnumReflectionProperty) {
+        $propertyAccessor = $metadata->getPropertyAccessor($property);
+        if ($propertyAccessor instanceof EnumPropertyAccessor) {
             $enumType = null;
 
-            $attributes = $reflectionProperty->getAttributes(Column::class);
+            $attributes = $propertyAccessor->getUnderlyingReflector()->getAttributes(Column::class);
             foreach ($attributes as $attribute) {
                 $attributeInstance = $attribute->newInstance();
                 $enumType = $attributeInstance->enumType;
