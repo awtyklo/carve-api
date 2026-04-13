@@ -6,12 +6,10 @@ namespace Carve\ApiBundle\Serializer\Normalizer;
 
 use Carve\ApiBundle\Attribute\Export\ExportEnumPrefix;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
-use Doctrine\ORM\Mapping\ReflectionEnumProperty;
+use Doctrine\ORM\Mapping\PropertyAccessors\EnumPropertyAccessor;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\Proxy;
-use ReflectionClass;
-use ReflectionProperty;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -86,8 +84,8 @@ class ExportEnumNormalizer implements NormalizerInterface
 
         $enumFields = [];
         foreach ($metadata->getFieldNames() as $fieldName) {
-            $reflectionProperty = $metadata->getReflectionProperty($fieldName);
-            if ($reflectionProperty instanceof ReflectionEnumProperty) {
+            $propertyAccessor = $metadata->getPropertyAccessor($fieldName);
+            if ($propertyAccessor instanceof EnumPropertyAccessor) {
                 $enumFields[] = $fieldName;
             }
         }
@@ -97,7 +95,7 @@ class ExportEnumNormalizer implements NormalizerInterface
 
     protected function getExportEnumPrefix(string $class, string $property): string
     {
-        $reflectionProperty = new ReflectionProperty($this->getRealClass($class), $property);
+        $reflectionProperty = new \ReflectionProperty($this->getRealClass($class), $property);
         $attributes = $reflectionProperty->getAttributes(ExportEnumPrefix::class);
 
         foreach ($attributes as $attribute) {
@@ -106,7 +104,7 @@ class ExportEnumNormalizer implements NormalizerInterface
             return $attributeInstance->getPrefix();
         }
 
-        $reflectionClass = new ReflectionClass($class);
+        $reflectionClass = new \ReflectionClass($class);
 
         return 'enum.'.strtolower($reflectionClass->getShortName()).'.'.$property.'.';
     }
