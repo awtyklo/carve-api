@@ -2,9 +2,8 @@
 
 /**
  * Code from Nelmio\ApiDocBundle\ModelDescriber
- * Line 128 has been overridden.
+ * Find "This line has been overridden" to find what was overridden.
  */
-
 declare(strict_types=1);
 
 namespace Carve\ApiBundle\ModelDescriber;
@@ -251,9 +250,11 @@ final class FormModelDescriber implements ModelDescriberInterface, ModelRegistry
                 if ($config->getOption('multiple')) {
                     $property->format = sprintf('[%s id]', $entityClass);
                     $property->type = 'array';
-                    $property->items = Util::createChild($property, OA\Items::class, ['type' => 'string']);
+                    // ! This line has been overridden. Assume that we only use integer IDs
+                    $property->items = Util::createChild($property, OA\Items::class, ['type' => 'integer']);
                 } else {
-                    $property->type = 'string';
+                    // ! This line has been overridden. Assume that we only use integer IDs
+                    $property->type = 'integer';
                     $property->format = sprintf('%s id', $entityClass);
                 }
 
